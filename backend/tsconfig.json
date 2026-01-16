@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"target": "es2020",
+		"module": "commonjs",
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": "./src",
+		"paths": {
+			"@/*": ["./*"],
+			"@config/*": ["config/*"],
+			"@controllers/*": ["controllers/*"],
+			"@dto/*": ["dto/*"],
+			"@middleware/*": ["middleware/*"],
+			"@routes/*": ["routes/*"],
+			"@services/*": ["services/*"],
+			"@types/*": ["types/*"],
+			"@utils/*": ["utils/*"]
+		}
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "prisma.config.ts"]
+}
