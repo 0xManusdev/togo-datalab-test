@@ -1,0 +1,43 @@
+{
+    "id": "togo-datalab-env",
+    "name": "Togo Datalab - Local",
+    "values": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8000/api",
+            "type": "default",
+            "enabled": true
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "secret",
+            "enabled": true
+        },
+        {
+            "key": "adminToken",
+            "value": "",
+            "type": "secret",
+            "enabled": true
+        },
+        {
+            "key": "userId",
+            "value": "",
+            "type": "default",
+            "enabled": true
+        },
+        {
+            "key": "vehicleId",
+            "value": "",
+            "type": "default",
+            "enabled": true
+        },
+        {
+            "key": "bookingId",
+            "value": "",
+            "type": "default",
+            "enabled": true
+        }
+    ],
+    "_postman_variable_scope": "environment"
+}

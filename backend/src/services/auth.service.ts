@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '../generated/prisma/client'
 import { LoginDTO, RegisterDTO } from '../dto/auth.schema';
 import { prisma } from '../utils/prisma';
+import { config } from '@/config/environment';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_temporaire_dev';
 
@@ -35,6 +36,34 @@ export class AuthService {
         return userWithoutPassword;
     }
 
+    async registerAdmin(data: RegisterDTO) {
+        const { email, password, firstName, lastName, phone } = data;
+
+        const existingUser = await prisma.user.findUnique({ 
+            where: { email } 
+        });
+
+        if (existingUser) {
+            throw new Error('Un utilisateur avec cet email existe déjà.');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                firstName,
+                lastName,
+                phone,
+                role: 'ADMIN',
+            },
+        });
+
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+    }
+
     async login(data: LoginDTO) {
         const { email, password } = data;
 
@@ -56,8 +85,7 @@ export class AuthService {
                 userId: user.id, 
                 role: user.role 
             },
-
-            JWT_SECRET,
+            config.jwtSecret,
             { 
                 expiresIn: '24h' 
             }
