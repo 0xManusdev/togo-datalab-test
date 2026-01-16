@@ -32,10 +32,12 @@ prisma.$on('query', (e) => {
 
 prisma.$on('error', (e) => {
     logger.error('Prisma Error: ' + e.message);
+    console.error('Prisma Error: ' + e.message);
 });
 
 prisma.$on('info', (e) => {
     logger.info('Prisma Info: ' + e.message);
+    console.error('Prisma Info: ' + e.message);
 });
 
 prisma.$on('warn', (e) => {

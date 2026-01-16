@@ -1,6 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { logger } from './config/logger';
 import { AppError } from './errors/AppError';
 
@@ -11,7 +12,11 @@ import bookingRoutes from './routes/booking.routes';
 const app: Application = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true  // Permet l'envoi des cookies
+}));
+app.use(cookieParser());
 app.use(express.json());
 
 app.get('/api/health', (req: Request, res: Response) => {

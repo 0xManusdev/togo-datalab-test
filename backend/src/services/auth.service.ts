@@ -5,7 +5,6 @@ import { LoginDTO, RegisterDTO } from '../dto/auth.schema';
 import { prisma } from '../utils/prisma';
 import { config } from '@/config/environment';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret_temporaire_dev';
 
 export class AuthService {
     async register(data: RegisterDTO) {
@@ -93,5 +92,18 @@ export class AuthService {
 
         const { password: _, ...userWithoutPassword } = user;
         return { user: userWithoutPassword, token };
+    }
+
+    async getUserById(userId: string) {
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+
+        if (!user) {
+            throw new Error('Utilisateur non trouvé');
+        }
+
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
     }
 }

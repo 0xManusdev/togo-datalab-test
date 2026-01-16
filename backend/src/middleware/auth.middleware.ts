@@ -8,20 +8,21 @@ export interface AuthRequest extends Request {
         userId: string;
         role: 'EMPLOYEE' | 'ADMIN';
     };
+    cookies: { [key: string]: string };
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction): void => {
     try {
-        const authHeader = req.headers.authorization;
+        let token = req.cookies?.token;
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        if (!token) {
             throw new UnauthorizedError('Token manquant');
         }
 
-        const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, config.jwtSecret) as { userId: string; role: 'EMPLOYEE' | 'ADMIN' };
 
         req.user = decoded;
+        
         next();
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
