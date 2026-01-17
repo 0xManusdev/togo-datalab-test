@@ -1,22 +1,33 @@
 import { prisma } from '../utils/prisma';
 import { CreateBookingDTO } from '../dto/booking.schema';
 import { AppError, ConflictError, NotFoundError, UnauthorizedError } from '../errors/AppError';
+import { Vehicle } from '../generated/prisma/client';
 
 export class BookingService {
-    
-    /**
-     * RÈGLE MÉTIER CRITIQUE : Vérification des chevauchements
-     * Un véhicule ne peut pas avoir deux réservations confirmées sur des périodes qui se chevauchent
-     */
-    private async checkOverlap(vehicleId: string, startDate: Date, endDate: Date, excludeBookingId?: string): Promise<boolean> {
-        const overlappingBooking = await prisma.booking.findFirst({
+    private validateDates(startDate: Date, endDate: Date): void {
+        const now = new Date();
+
+        if (startDate >= endDate) {
+            throw new AppError('La date de fin doit être après la date de début', 400);
+        }
+
+        if (startDate < now) {
+            throw new AppError('Impossible de créer une réservation dans le passé', 400);
+        }
+    }
+
+    private async checkOverlapInTransaction(
+        tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
+        vehicleId: string,
+        startDate: Date,
+        endDate: Date,
+        excludeBookingId?: string
+    ): Promise<boolean> {
+        const overlappingBooking = await tx.booking.findFirst({
             where: {
                 vehicleId,
                 status: 'CONFIRMED',
                 id: excludeBookingId ? { not: excludeBookingId } : undefined,
-                // Condition de chevauchement : 
-                // La nouvelle réservation commence avant la fin d'une existante
-                // ET finit après le début d'une existante
                 AND: [
                     { startDate: { lt: endDate } },
                     { endDate: { gt: startDate } }
@@ -28,10 +39,8 @@ export class BookingService {
     }
 
     async findAll(userId: string, role: string) {
-        // Les admins voient toutes les réservations
-        // Les employés ne voient que les leurs
         const where = role === 'ADMIN' ? {} : { userId };
-        
+
         return prisma.booking.findMany({
             where,
             include: {
@@ -59,7 +68,6 @@ export class BookingService {
             throw new NotFoundError('Réservation non trouvée');
         }
 
-        // Vérifier les droits d'accès
         if (role !== 'ADMIN' && booking.userId !== userId) {
             throw new UnauthorizedError('Vous ne pouvez pas accéder à cette réservation');
         }
@@ -71,39 +79,50 @@ export class BookingService {
         const startDate = new Date(data.startDate);
         const endDate = new Date(data.endDate);
 
-        // Vérifier que le véhicule existe et est disponible
-        const vehicle = await prisma.vehicle.findUnique({
-            where: { id: data.vehicleId }
-        });
+        this.validateDates(startDate, endDate);
 
-        if (!vehicle) {
-            throw new NotFoundError('Véhicule non trouvé');
-        }
+        return prisma.$transaction(async (tx) => {
+            const vehicles = await tx.$queryRaw<Vehicle[]>`
+                SELECT * FROM "Vehicle" 
+                WHERE id = ${data.vehicleId}::uuid 
+                FOR UPDATE
+            `;
 
-        if (!vehicle.isAvailable) {
-            throw new ConflictError('Ce véhicule n\'est pas disponible à la réservation');
-        }
+            const vehicle = vehicles[0];
 
-        // 🔴 RÈGLE MÉTIER CRITIQUE : Vérifier les chevauchements
-        const hasOverlap = await this.checkOverlap(data.vehicleId, startDate, endDate);
-        
-        if (hasOverlap) {
-            throw new ConflictError(
-                'Ce véhicule est déjà réservé sur cette période. Veuillez choisir d\'autres dates.'
-            );
-        }
-
-        return prisma.booking.create({
-            data: {
-                vehicleId: data.vehicleId,
-                userId,
-                startDate,
-                endDate,
-                status: 'CONFIRMED'
-            },
-            include: {
-                vehicle: true
+            if (!vehicle) {
+                throw new NotFoundError('Véhicule non trouvé');
             }
+
+            if (!vehicle.isAvailable) {
+                throw new ConflictError('Ce véhicule n\'est pas disponible à la réservation');
+            }
+
+            const hasOverlap = await this.checkOverlapInTransaction(
+                tx,
+                data.vehicleId,
+                startDate,
+                endDate
+            );
+
+            if (hasOverlap) {
+                throw new ConflictError(
+                    'Ce véhicule est déjà réservé sur cette période. Veuillez choisir d\'autres dates.'
+                );
+            }
+
+            return tx.booking.create({
+                data: {
+                    vehicleId: data.vehicleId,
+                    userId,
+                    startDate,
+                    endDate,
+                    status: 'CONFIRMED'
+                },
+                include: {
+                    vehicle: true
+                }
+            });
         });
     }
 
@@ -114,7 +133,6 @@ export class BookingService {
             throw new AppError('Cette réservation est déjà annulée');
         }
 
-        // Vérifier que la réservation n'est pas déjà passée
         if (new Date(booking.startDate) < new Date()) {
             throw new AppError('Impossible d\'annuler une réservation passée ou en cours');
         }
@@ -131,7 +149,7 @@ export class BookingService {
             where: {
                 vehicleId,
                 status: 'CONFIRMED',
-                endDate: { gte: new Date() } // Seulement les réservations futures
+                endDate: { gte: new Date() }
             },
             orderBy: { startDate: 'asc' }
         });
