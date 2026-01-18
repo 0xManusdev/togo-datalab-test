@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { BookingService } from '../services/booking.service';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { paginationSchema } from '../utils/pagination';
 
 export class BookingController {
     private bookingService: BookingService;
@@ -11,11 +12,18 @@ export class BookingController {
 
     public findAll = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const bookings = await this.bookingService.findAll(
+            const paginationResult = paginationSchema.safeParse(req.query);
+            const { page, limit } = paginationResult.success 
+                ? paginationResult.data 
+                : { page: 1, limit: 20 };
+
+            const result = await this.bookingService.findAll(
                 req.user!.userId,
-                req.user!.role
+                req.user!.role,
+                page,
+                limit
             );
-            res.json({ status: 'success', data: bookings });
+            res.json({ status: 'success', ...result });
         } catch (error) {
             next(error);
         }

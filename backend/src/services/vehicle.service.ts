@@ -1,12 +1,20 @@
 import { prisma } from '../utils/prisma';
 import { CreateVehicleDTO, UpdateVehicleDTO } from '../dto/vehicle.schema';
 import { ConflictError, NotFoundError } from '../errors/AppError';
+import { createPaginatedResponse } from '../utils/pagination';
 
 export class VehicleService {
-    async findAll() {
-        return prisma.vehicle.findMany({
-            orderBy: { createdAt: 'desc' }
-        });
+    async findAll(page: number = 1, limit: number = 20) {
+        const [vehicles, total] = await Promise.all([
+            prisma.vehicle.findMany({
+                orderBy: { createdAt: 'desc' },
+                skip: (page - 1) * limit,
+                take: limit,
+            }),
+            prisma.vehicle.count()
+        ]);
+
+        return createPaginatedResponse(vehicles, total, page, limit);
     }
 
     async findAvailable(startDate: Date, endDate: Date) {
@@ -16,12 +24,8 @@ export class VehicleService {
                 bookings: {
                     none: {
                         status: 'CONFIRMED',
-                        OR: [
-                            {
-                                startDate: { lte: endDate },
-                                endDate: { gte: startDate }
-                            }
-                        ]
+                        startDate: { lt: endDate },
+                        endDate: { gt: startDate }
                     }
                 }
             }

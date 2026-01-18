@@ -1,6 +1,7 @@
 import { AuthRequest } from '@/middleware/auth.middleware';
 import { VehicleService } from '@/services/vehicle.service';
 import { availableVehiclesQuerySchema } from '@/dto/vehicle.schema';
+import { paginationSchema } from '@/utils/pagination';
 import { Response, NextFunction } from 'express';
 
 
@@ -13,8 +14,13 @@ export class VehicleController {
 
     public findAll = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const vehicles = await this.vehicleService.findAll();
-            res.json({ status: 'success', data: vehicles });
+            const paginationResult = paginationSchema.safeParse(req.query);
+            const { page, limit } = paginationResult.success 
+                ? paginationResult.data 
+                : { page: 1, limit: 20 };
+
+            const result = await this.vehicleService.findAll(page, limit);
+            res.json({ status: 'success', ...result });
         } catch (error) {
             next(error);
         }

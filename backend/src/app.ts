@@ -2,8 +2,11 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 import { logger } from './config/logger';
 import { AppError } from './errors/AppError';
+import { authRateLimiter, apiRateLimiter } from './middleware/rateLimit.middleware';
+import { prisma } from './utils/prisma';
 
 import authRoutes from './routes/auth.routes';
 import vehicleRoutes from './routes/vehicle.routes';
@@ -14,20 +17,43 @@ const app: Application = express();
 app.use(helmet());
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true  // Permet l'envoi des cookies
+    credentials: true
 }));
+
+const morganStream = {
+    write: (message: string) => logger.info(message.trim())
+};
+app.use(morgan('combined', { stream: morganStream }));
+
 app.use(cookieParser());
 app.use(express.json());
 
-app.get('/api/health', (req: Request, res: Response) => {
-    res.status(200).json({
+app.use('/api', apiRateLimiter);
+
+app.get('/api/health', async (req: Request, res: Response) => {
+    const healthcheck = {
         status: 'success',
-        message: 'API en ligne !',
-        timestamp: new Date().toISOString()
-    });
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        services: {
+            api: 'healthy',
+            database: 'unknown'
+        }
+    };
+
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        healthcheck.services.database = 'healthy';
+        res.status(200).json(healthcheck);
+    } catch (error) {
+        healthcheck.status = 'degraded';
+        healthcheck.services.database = 'unhealthy';
+        logger.error('Database health check failed', { error });
+        res.status(503).json(healthcheck);
+    }
 });
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRateLimiter, authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/bookings', bookingRoutes);
 

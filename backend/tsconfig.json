@@ -1,26 +1,33 @@
 {
 	"compilerOptions": {
-		"target": "es2020",
+		"target": "ES2022",
 		"module": "commonjs",
+		"lib": ["ES2022"],
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"baseUrl": "./src",
+		"resolveJsonModule": true,
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./*"],
-			"@config/*": ["config/*"],
-			"@controllers/*": ["controllers/*"],
-			"@dto/*": ["dto/*"],
-			"@middleware/*": ["middleware/*"],
-			"@routes/*": ["routes/*"],
-			"@services/*": ["services/*"],
-			"@types/*": ["types/*"],
-			"@utils/*": ["utils/*"]
+			"@/*": ["src/*"],
+			"@config/*": ["src/config/*"],
+			"@controllers/*": ["src/controllers/*"],
+			"@dto/*": ["src/dto/*"],
+			"@middleware/*": ["src/middleware/*"],
+			"@routes/*": ["src/routes/*"],
+			"@services/*": ["src/services/*"],
+			"@types/*": ["src/types/*"],
+			"@utils/*": ["src/utils/*"],
+			"@errors/*": ["src/errors/*"],
+			"@generated/*": ["src/generated/*"]
 		}
 	},
 	"include": ["src/**/*"],
-	"exclude": ["node_modules", "prisma.config.ts"]
+	"exclude": ["node_modules", "dist", "tests"]
 }

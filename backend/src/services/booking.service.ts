@@ -2,8 +2,10 @@ import { prisma } from '../utils/prisma';
 import { CreateBookingDTO } from '../dto/booking.schema';
 import { AppError, ConflictError, NotFoundError, UnauthorizedError } from '../errors/AppError';
 import { Vehicle } from '../generated/prisma/client';
+import { createPaginatedResponse, PaginatedResponse } from '../utils/pagination';
 
 export class BookingService {
+    
     private validateDates(startDate: Date, endDate: Date): void {
         const now = new Date();
 
@@ -38,19 +40,26 @@ export class BookingService {
         return !!overlappingBooking;
     }
 
-    async findAll(userId: string, role: string) {
+    async findAll(userId: string, role: string, page: number = 1, limit: number = 20) {
         const where = role === 'ADMIN' ? {} : { userId };
 
-        return prisma.booking.findMany({
-            where,
-            include: {
-                vehicle: true,
-                user: {
-                    select: { id: true, firstName: true, lastName: true, email: true }
-                }
-            },
-            orderBy: { startDate: 'desc' }
-        });
+        const [bookings, total] = await Promise.all([
+            prisma.booking.findMany({
+                where,
+                include: {
+                    vehicle: true,
+                    user: {
+                        select: { id: true, firstName: true, lastName: true, email: true }
+                    }
+                },
+                orderBy: { startDate: 'desc' },
+                skip: (page - 1) * limit,
+                take: limit,
+            }),
+            prisma.booking.count({ where })
+        ]);
+
+        return createPaginatedResponse(bookings, total, page, limit);
     }
 
     async findById(id: string, userId: string, role: string) {

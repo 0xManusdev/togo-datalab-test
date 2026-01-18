@@ -1,12 +1,13 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '../generated/prisma/client'
 import { LoginDTO, RegisterDTO } from '../dto/auth.schema';
 import { prisma } from '../utils/prisma';
 import { config } from '@/config/environment';
+import { AppError, ConflictError, UnauthorizedError } from '@/errors/AppError';
 
 
 export class AuthService {
+
     async register(data: RegisterDTO) {
         const { email, password, firstName, lastName, phone } = data;
 
@@ -15,10 +16,10 @@ export class AuthService {
         });
 
         if (existingUser) {
-            throw new Error('Un utilisateur avec cet email existe déjà.');
+            throw new ConflictError('Un utilisateur avec cette adresse email existe déjà.');
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 12);
 
         const user = await prisma.user.create({
             data: {
@@ -43,10 +44,10 @@ export class AuthService {
         });
 
         if (existingUser) {
-            throw new Error('Un utilisateur avec cet email existe déjà.');
+            throw new ConflictError('Un administrateur avec cette adresse email existe déjà.');
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 12);
 
         const user = await prisma.user.create({
             data: {
@@ -70,13 +71,14 @@ export class AuthService {
             where: { email } 
         });
 
+        // Message générique pour éviter l'énumération d'utilisateurs
         if (!user) {
-            throw new Error('Ce compte n\'existe pas. Veuillez vérifier votre adresse mail ou créer un nouveau compte.');
+            throw new UnauthorizedError('Identifiants incorrects.');
         }
 
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) {
-            throw new Error('Identifiants incorrects. Votre email ou mot de passe est erroné.');
+            throw new UnauthorizedError('Identifiants incorrects.');
         }
 
         const token = jwt.sign(
@@ -100,7 +102,7 @@ export class AuthService {
         });
 
         if (!user) {
-            throw new Error('Utilisateur non trouvé');
+            throw new AppError('Utilisateur non trouvé', 404);
         }
 
         const { password: _, ...userWithoutPassword } = user;
