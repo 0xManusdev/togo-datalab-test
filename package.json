@@ -7,9 +7,13 @@
         "frontend"
     ],
     "scripts": {
-        "dev": "npm run dev --workspaces --if-present",
+        "dev": "concurrently -n \"backend,frontend\" -c \"blue,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
         "dev:backend": "npm run dev -w backend",
         "dev:frontend": "npm run dev -w frontend",
-        "build": "npm run build --workspaces --if-present"
+        "build": "npm run build --workspaces --if-present",
+        "install:all": "npm install && npm install -w backend && npm install -w frontend"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
     }
 }
