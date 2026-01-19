@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Car, Calendar, Edit, Trash2 } from "lucide-react";
@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useVehicle, useDeleteVehicle } from "@/hooks/useVehicles";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function VehicleDetailPage({
 	params,
@@ -22,17 +24,19 @@ export default function VehicleDetailPage({
 	const { user } = useAuth();
 	const { data, isLoading } = useVehicle(id);
 	const deleteVehicle = useDeleteVehicle();
+	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
 	const isAdmin = user?.role === "ADMIN";
 	const vehicle = data?.data;
 
 	const handleDelete = async () => {
-		if (!confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) return;
 		try {
 			await deleteVehicle.mutateAsync(id);
+			setShowDeleteDialog(false);
+			toast.success("Véhicule supprimé avec succès");
 			router.push("/vehicles");
 		} catch (error) {
-			alert("Erreur lors de la suppression");
+			toast.error("Erreur lors de la suppression");
 		}
 	};
 
@@ -65,6 +69,7 @@ export default function VehicleDetailPage({
 	) || [];
 
 	return (
+		<>
 		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex items-center gap-4">
@@ -89,8 +94,7 @@ export default function VehicleDetailPage({
 						</Link>
 						<Button
 							variant="destructive"
-							onClick={handleDelete}
-							disabled={deleteVehicle.isPending}
+							onClick={() => setShowDeleteDialog(true)}
 						>
 							<Trash2 className="mr-2 h-4 w-4" />
 							Supprimer
@@ -100,7 +104,6 @@ export default function VehicleDetailPage({
 			</div>
 
 			<div className="grid gap-6 lg:grid-cols-2">
-				{/* Vehicle Info */}
 				<Card>
 					<CardHeader>
 						<CardTitle>Informations</CardTitle>
@@ -150,7 +153,6 @@ export default function VehicleDetailPage({
 					</CardContent>
 				</Card>
 
-				{/* Upcoming Bookings */}
 				<Card>
 					<CardHeader>
 						<CardTitle>Réservations à venir</CardTitle>
@@ -190,5 +192,17 @@ export default function VehicleDetailPage({
 				</Card>
 			</div>
 		</div>
+			<ConfirmDialog
+				isOpen={showDeleteDialog}
+				onClose={() => setShowDeleteDialog(false)}
+				onConfirm={handleDelete}
+				title="Supprimer ce véhicule ?"
+				description="Cette action est irréversible. Toutes les réservations passées associées à ce véhicule seront également supprimées."
+				confirmText="Supprimer"
+				cancelText="Annuler"
+				isLoading={deleteVehicle.isPending}
+				variant="destructive"
+			/>
+		</>
 	);
 }

@@ -57,7 +57,6 @@ export default function BookingsPage() {
                 </Link>
             </div>
 
-            {/* Filters */}
             <div className="flex gap-2">
                 <Button
                     variant={statusFilter === "ALL" ? "default" : "outline"}
@@ -82,7 +81,6 @@ export default function BookingsPage() {
                 </Button>
             </div>
 
-            {/* Bookings List */}
             {isLoading ? (
                 <div className="space-y-4">
                     {[1, 2, 3, 4].map((i) => (
@@ -125,9 +123,9 @@ export default function BookingsPage() {
 
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
-                                            <h3 className="font-semibold">
+                                            <h6 className="font-semibold text-sm">
                                                 {booking.vehicle.brand} {booking.vehicle.model}
-                                            </h3>
+                                            </h6>
                                             <Badge
                                                 variant={
                                                     booking.status === "CONFIRMED"
@@ -141,7 +139,7 @@ export default function BookingsPage() {
                                                     : "Annulée"}
                                             </Badge>
                                         </div>
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-xs text-muted-foreground">
                                             {booking.vehicle.licensePlate}
                                         </p>
 
@@ -151,6 +149,9 @@ export default function BookingsPage() {
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-medium">
                                                         {formatDateTime(booking.startDate)}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        au
                                                     </span>
                                                     <span className="font-medium">
                                                         {formatDateTime(booking.endDate)}

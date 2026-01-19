@@ -31,7 +31,7 @@ import { Vehicle } from "@/types";
 
 export default function BookPage() {
 	const { user } = useAuth();
-	
+
 	const [startDate, setStartDate] = useState<Date | undefined>(new Date());
 	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 	const [reason, setReason] = useState("");
@@ -61,7 +61,6 @@ export default function BookPage() {
 		endDate > startDate &&
 		startDate > new Date();
 
-	// Validation pour confirmer la réservation (inclut le motif et la destination)
 	const canConfirm = canSearch && reason.trim().length >= 5 && destination.trim().length >= 2;
 
 	const {
@@ -118,36 +117,33 @@ export default function BookPage() {
 	return (
 		<>
 			<div className="space-y-8">
-				{/* Welcome Header */}
 				<div>
 					<p className="text-muted-foreground text-xl">
-						Faire une demande
+						Faire une réservation
 					</p>
 				</div>
 
-				{/* Search Form */}
 				<Card>
 					<CardContent className="pt-6">
 						<div className="space-y-4">
-							{/* Date Selection */}
 							<div className="grid gap-4 sm:grid-cols-2">
 								<DateTimePicker
-									label="Date et heure de début"
+									label="Date et heure de départ"
 									date={startDate}
 									setDate={(date) => {
 										setStartDate(date);
 										setHasSearched(false);
 									}}
-									placeholder="Sélectionner le début"
+									placeholder="Sélectionner date et l'heure de départ"
 								/>
 								<DateTimePicker
-									label="Date et heure de fin"
+									label="Date et heure de retour"
 									date={endDate}
 									setDate={(date) => {
 										setEndDate(date);
 										setHasSearched(false);
 									}}
-									placeholder="Sélectionner la fin"
+									placeholder="Sélectionner la date et l'heure de retour"
 									minDate={startDate}
 								/>
 							</div>
@@ -170,7 +166,6 @@ export default function BookPage() {
 					</CardFooter>
 				</Card>
 
-				{/* Results */}
 				{hasSearched && (
 					<div className="space-y-4">
 						<div className="flex items-center justify-between">
@@ -226,14 +221,16 @@ export default function BookPage() {
 										<CardContent className="pt-4">
 											<div className="flex items-start justify-between">
 												<div>
-													<h3 className="font-semibold">
+													<h5 className="font-semibold text-xs">
 														{vehicle.brand} {vehicle.model}
-													</h3>
-													<p className="text-sm text-muted-foreground">
+													</h5>
+													<p className="text-xs text-muted-foreground">
 														{vehicle.licensePlate}
 													</p>
 												</div>
-												<Badge variant="success">Disponible</Badge>
+												<Badge className="font-light text-[10px]" variant="success">
+													Disponible
+												</Badge>
 											</div>
 										</CardContent>
 										<CardFooter>
@@ -294,11 +291,10 @@ export default function BookPage() {
 										className="flex items-center justify-between rounded-lg border p-4"
 									>
 										<div className="flex items-center gap-4">
-											<div className={`flex h-12 w-12 items-center justify-center rounded-lg ${
-												booking.status === "CONFIRMED" 
+											<div className={`flex h-12 w-12 items-center justify-center rounded-lg ${booking.status === "CONFIRMED"
 													? "bg-primary/10 text-primary"
 													: "bg-muted text-muted-foreground"
-											}`}>
+												}`}>
 												<Car className="h-6 w-6" />
 											</div>
 											<div>
@@ -310,7 +306,7 @@ export default function BookPage() {
 												</p>
 											</div>
 										</div>
-										<Badge 
+										<Badge
 											variant={booking.status === "CONFIRMED" ? "success" : "secondary"}
 										>
 											{booking.status === "CONFIRMED" ? (

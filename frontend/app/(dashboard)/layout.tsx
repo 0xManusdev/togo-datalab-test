@@ -46,7 +46,7 @@ export default function DashboardLayout({
                 )}
             >
                 <Header />
-                <main className="p-8 rounded-2xl border-2 border-muted">{children}</main>
+                <main className="p-8 rounded-tl-3xl min-h-screen border-2 border-muted border-b-0">{children}</main>
             </div>
         </div>
     );

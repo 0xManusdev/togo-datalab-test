@@ -51,14 +51,12 @@ export default function DashboardPage() {
 
     const isAdmin = user?.role === "ADMIN";
 
-    // Redirect employees to /book
     useEffect(() => {
         if (!authLoading && user && !isAdmin) {
             router.replace("/book");
         }
     }, [authLoading, user, isAdmin, router]);
 
-    // Show loading while checking role or redirecting
     if (authLoading || (!isAdmin && user)) {
         return (
             <div className="flex h-64 items-center justify-center">
@@ -67,7 +65,6 @@ export default function DashboardPage() {
         );
     }
 
-    // Only admins see the dashboard below
     const bookings = bookingsData?.data || [];
     const vehicles = vehiclesData?.data || [];
 
@@ -80,17 +77,12 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
-            {/* Admin Welcome */}
             <div>
                 <h1 className="text-2xl font-bold">
-                    Bonjour, {user?.firstName} 👋
-                </h1>
-                <p className="text-muted-foreground">
                     Voici un aperçu de votre parc automobile
-                </p>
+                </h1>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatsCard
                     title="Réservations ce mois"

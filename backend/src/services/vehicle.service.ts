@@ -115,6 +115,8 @@ export class VehicleService {
             throw new ConflictError('Impossible de supprimer : des réservations sont en cours');
         }
 
+        await prisma.booking.deleteMany({ where: { vehicleId: id } });
+
         return prisma.vehicle.delete({ where: { id } });
     }
 }

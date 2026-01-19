@@ -3,63 +3,38 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* --- THÈME DE BASE (LIGHT MODE) --- */
 :root {
-	/* Rayon des bordures : Un peu plus carré (0.5rem) fait plus "pro" que trop arrondi */
 	--radius: 0.5rem;
-
-	/* FOND : Blanc très légèrement cassé (Slate 50) pour moins éblouir */
 	--background: oklch(0.99 0.003 200);
-	/* TEXTE : Gris Anthracite profond (Slate 900), plus doux que le noir pur */
 	--foreground: oklch(0.21 0.03 260);
-
-	/* CARTES : Blanc pur pour ressortir sur le fond */
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.21 0.03 260);
 
 	--popover: oklch(1 0 0);
 	--popover-foreground: oklch(0.21 0.03 260);
 
-	/* PRIMAIRE : "Togo Tech Teal" - Un vert/bleu profond, sérieux et moderne */
-	/* C'est la couleur de ton bouton "Réserver" */
-	--primary: oklch(0.48 0.16 175);
+	--primary: oklch(0.4653 0.0954 166.97);
 	--primary-foreground: oklch(1 0 0);
-
-	/* SECONDAIRE : Un gris bleuté très clair pour les fonds de section */
 	--secondary: oklch(0.96 0.01 260);
 	--secondary-foreground: oklch(0.21 0.03 260);
-
-	/* MUTED : Pour les textes secondaires (dates, légendes) */
 	--muted: oklch(0.96 0.01 260);
 	--muted-foreground: oklch(0.55 0.04 260);
-
-	/* ACCENT : Au survol des éléments */
 	--accent: oklch(0.94 0.02 260);
 	--accent-foreground: oklch(0.21 0.03 260);
 
-	/* DESTRUCTIVE : Rouge moderne, moins agressif */
 	--destructive: oklch(0.6 0.2 25);
 	--destructive-foreground: oklch(0.98 0 0);
 
-	/* BORDURES : Gris subtil */
 	--border: oklch(0.90 0.02 260);
 	--input: oklch(0.90 0.02 260);
-	--ring: #006A4E;
-	/* Focus ring de la couleur primaire */
+	--ring: oklch(0.4653 0.0954 166.97);
 
-	/* GRAPHIQUES (Si tu fais un dashboard admin plus tard) */
 	--chart-1: oklch(0.48 0.16 175);
-	/* Teal */
 	--chart-2: oklch(0.65 0.20 150);
-	/* Vert clair */
 	--chart-3: oklch(0.35 0.10 260);
-	/* Bleu nuit */
 	--chart-4: oklch(0.85 0.15 90);
-	/* Jaune/Or (Clin d'oeil Togo) */
 	--chart-5: oklch(0.60 0.15 30);
-	/* Rouge brique */
 
-	/* SIDEBAR (Light mode) : Légèrement distincte du fond */
 	--sidebar: oklch(0.98 0.005 260);
 	--sidebar-foreground: oklch(0.35 0.04 260);
 	--sidebar-primary: oklch(0.48 0.16 175);
@@ -70,20 +45,16 @@
 	--sidebar-ring: oklch(0.48 0.16 175);
 }
 
-/* --- DARK MODE (Sérieux et "Data") --- */
 .dark {
-	/* FOND : Bleu nuit très profond (Slate 950+), pas noir pur */
 	--background: oklch(0.14 0.04 260);
 	--foreground: oklch(0.98 0.01 260);
 
-	/* CARTES : Un poil plus clair que le fond pour la hiérarchie */
 	--card: oklch(0.17 0.04 260);
 	--card-foreground: oklch(0.98 0.01 260);
 
 	--popover: oklch(0.17 0.04 260);
 	--popover-foreground: oklch(0.98 0.01 260);
 
-	/* PRIMAIRE : On éclaircit le Teal pour qu'il ressorte sur le sombre */
 	--primary: oklch(0.65 0.16 175);
 	--primary-foreground: oklch(0.14 0.04 260);
 
@@ -103,7 +74,6 @@
 	--input: oklch(0.25 0.04 260);
 	--ring: oklch(0.55 0.16 175);
 
-	/* Charts Dark mode */
 	--chart-1: oklch(0.65 0.16 175);
 	--chart-2: oklch(0.75 0.18 150);
 	--chart-3: oklch(0.50 0.10 260);

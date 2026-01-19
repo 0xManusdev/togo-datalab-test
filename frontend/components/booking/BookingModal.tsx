@@ -51,7 +51,6 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 				description: `${vehicle.brand} ${vehicle.model} réservé du ${formatDate(startDate)} au ${formatDate(endDate)}`,
 			});
 
-			// Reset form and close
 			setStartDate("");
 			setEndDate("");
 			setReason("");
@@ -84,7 +83,6 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 			description={`Réservez ${vehicle.brand} ${vehicle.model}`}
 		>
 			<div className="space-y-6">
-				{/* Vehicle Info */}
 				<div className="flex items-center gap-4 rounded-lg border p-4">
 					<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
 						<Car className="h-6 w-6" />
@@ -100,7 +98,6 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 					<Badge variant="success">Disponible</Badge>
 				</div>
 
-				{/* Date Selection */}
 				<div className="grid gap-4 sm:grid-cols-2">
 					<div className="space-y-2">
 						<Label htmlFor="startDate">Date de début</Label>
@@ -124,7 +121,6 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 					</div>
 				</div>
 
-				{/* Destination */}
 				<div className="space-y-2">
 					<Label htmlFor="destination" className="flex items-center gap-2">
 						Destination *
@@ -138,7 +134,6 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 					/>
 				</div>
 
-				{/* Reason for booking */}
 				<div className="space-y-2">
 					<Label htmlFor="reason" className="flex items-center gap-2">
 						<FileText className="h-4 w-4" />
@@ -158,7 +153,6 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 					</p>
 				</div>
 
-				{/* Summary */}
 				{startDate && endDate && (
 					<div className="rounded-lg bg-muted p-4 text-sm">
 						<p className="font-medium">Récapitulatif</p>
@@ -178,7 +172,6 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 					</div>
 				)}
 
-				{/* Actions */}
 				<div className="flex justify-end gap-3">
 					<Button variant="outline" onClick={handleClose}>
 						Annuler

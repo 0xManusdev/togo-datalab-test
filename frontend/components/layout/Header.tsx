@@ -32,20 +32,11 @@ export function Header() {
 		<header className="sticky top-0 z-30 flex h-16 items-center justify-between border-none bg-background px-6">
 			<div className="flex items-center gap-4">
 				<h1 className="text-lg font-normal">
-					Bienvenue, <span className="font-bold">{user?.firstName}</span> 👋
+					Bienvenue, <span className="font-bold">{user?.firstName} !</span>
 				</h1>
 			</div>
 
 			<div className="flex items-center gap-2">
-				{/* Notifications */}
-				{/* <Button variant="ghost" size="icon" className="relative">
-					<Bell className="h-5 w-5" />
-					<span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-						3
-					</span>
-				</Button> */}
-
-				{/* Theme Toggle */}
 				<Button
 					variant="ghost"
 					size="icon"
@@ -56,21 +47,12 @@ export function Header() {
 					<span className="sr-only">Toggle theme</span>
 				</Button>
 
-				{/* User Menu with Dropdown */}
 				<div className="flex items-center gap-3 border-l pl-4">
-					{/* <div className="hidden text-right sm:block">
-						<p className="text-sm font-medium">
-							{user?.firstName} {user?.lastName}
-						</p>
-						<p className="text-xs text-muted-foreground">
-							{user?.role === "ADMIN" ? "Administrateur" : "Employé"}
-						</p>
-					</div> */}
 					<DropdownMenu
 						trigger={
 							<Avatar className="cursor-pointer transition-opacity hover:opacity-80">
 								<AvatarFallback className="bg-primary text-primary-foreground">
-									{initials}
+									<User className="h-4 w-4" />
 								</AvatarFallback>
 							</Avatar>
 						}

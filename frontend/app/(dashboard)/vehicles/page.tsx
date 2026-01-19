@@ -38,17 +38,17 @@ export default function VehiclesPage() {
 						Consultez le parc automobile
 					</p>
 				</div>
-				<div className="flex gap-2">
+				<div className="grid grid-cols-2 gap-2">
 					<Link href="/book">
-						<Button>
-							<CalendarPlus className="mr-2 h-4 w-4" />
-							Réserver un véhicule
+						<Button className="w-full cursor-pointer text-xs">
+							<CalendarPlus className="mr-1 h-4 w-4" />
+							Réserver
 						</Button>
 					</Link>
 					{isAdmin && (
 						<Link href="/vehicles/new">
-							<Button variant="outline">
-								<Plus className="mr-2 h-4 w-4" />
+							<Button variant="outline" className="w-full cursor-pointer text-xs">
+								<Plus className="mr-1 h-4 w-4" />
 								Ajouter
 							</Button>
 						</Link>
@@ -56,18 +56,6 @@ export default function VehiclesPage() {
 				</div>
 			</div>
 
-			{/* Info Banner */}
-			<div className="rounded-lg border bg-muted/50 p-4">
-				<p className="text-sm text-muted-foreground">
-					<strong>💡 Conseil :</strong> Pour réserver un véhicule, utilisez la page{" "}
-					<Link href="/book" className="text-primary underline hover:no-underline">
-						Réserver
-					</Link>{" "}
-					qui vous montrera uniquement les véhicules disponibles pour vos dates.
-				</p>
-			</div>
-
-			{/* Search */}
 			<div className="relative max-w-md">
 				<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 				<Input
@@ -78,7 +66,6 @@ export default function VehiclesPage() {
 				/>
 			</div>
 
-			{/* Vehicles Grid */}
 			{isLoading ? (
 				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{[1, 2, 3, 4, 5, 6].map((i) => (
@@ -122,14 +109,15 @@ export default function VehiclesPage() {
 							<CardContent className="pt-4">
 								<div className="flex items-start justify-between">
 									<div>
-										<h3 className="font-semibold">
+										<h1 className="font-semibold text-sm">
 											{vehicle.brand} {vehicle.model}
-										</h3>
+										</h1>
 										<p className="text-sm text-muted-foreground">
 											{vehicle.licensePlate}
 										</p>
 									</div>
 									<Badge 
+										className="text-[10px] font-light"
 										variant={
 											vehicle.currentlyBooked 
 												? "destructive" 

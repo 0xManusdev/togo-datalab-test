@@ -43,9 +43,8 @@ export default function LoginPage() {
             toast.success("Connexion réussie", {
                 description: `Bienvenue ${user.firstName} !`,
             });
-            // Rediriger selon le rôle
             if (user.role === "ADMIN") {
-                router.push("/admin/users");
+                router.push("/");
             } else {
                 router.push("/bookings");
             }
@@ -108,7 +107,7 @@ export default function LoginPage() {
                 </CardContent>
 
                 <CardFooter className="flex flex-col gap-4">
-                    <Button type="submit" className="w-full rounded-full cursor-pointer" disabled={isSubmitting}>
+                    <Button type="submit" className="w-full rounded-full text-[#FFCE15] cursor-pointer" disabled={isSubmitting}>
                         {isSubmitting
                             ? <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             : "Se connecter"

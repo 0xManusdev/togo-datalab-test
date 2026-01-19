@@ -63,11 +63,11 @@ const adminNavItems = [
 		href: "/admin/users",
 		icon: Users,
 	},
-	{
-		title: "Paramètres",
-		href: "/admin/settings",
-		icon: Settings,
-	},
+	// {
+	// 	title: "Paramètres",
+	// 	href: "/admin/settings",
+	// 	icon: Settings,
+	// },
 ];
 
 export function Sidebar() {
@@ -92,12 +92,8 @@ export function Sidebar() {
 			)}
 		>
 			<div className="flex h-full flex-col">
-				{/* Header avec Logo et Collapse */}
 				<div className="flex h-16 items-center justify-between px-4">
 					<Link href="/" className="flex items-center gap-2">
-						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-							<Car className="h-5 w-5" />
-						</div>
 						{!sidebarCollapsed && (
 							<span className="text-xl font-bold text-primary">Carrent</span>
 						)}
@@ -124,7 +120,7 @@ export function Sidebar() {
 									key={item.href}
 									href={item.href}
 									className={cn(
-										"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+										"flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
 										pathname === item.href
 											? "bg-primary text-primary-foreground"
 											: "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -137,14 +133,13 @@ export function Sidebar() {
 						</div>
 					)}
 
-					{/* Main nav items (for everyone) */}
 					<div className="space-y-1">
 						{mainNavItems.map((item) => (
 							<Link
 								key={item.href}
 								href={item.href}
 								className={cn(
-									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+									"flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
 									pathname === item.href
 										? "bg-primary text-primary-foreground"
 										: "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -156,7 +151,6 @@ export function Sidebar() {
 						))}
 					</div>
 
-					{/* Admin section */}
 					{isAdmin && (
 						<>
 							<div className="my-4 border-t" />
@@ -173,7 +167,7 @@ export function Sidebar() {
 										key={item.href}
 										href={item.href}
 										className={cn(
-											"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+											"flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
 											pathname === item.href
 												? "bg-primary text-primary-foreground"
 												: "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -188,13 +182,12 @@ export function Sidebar() {
 					)}
 				</nav>
 
-				{/* Logout Button */}
 				<div className="border-t p-4">
 					<Button
 						variant="ghost"
 						size="sm"
 						onClick={handleLogout}
-						className="w-full justify-start text-muted-foreground hover:text-destructive"
+						className="w-full justify-start cursor-pointer p-4 text-muted-foreground hover:text-destructive"
 					>
 						<LogOut className="h-5 w-5 shrink-0" />
 						{!sidebarCollapsed && <span className="ml-3">Déconnexion</span>}
