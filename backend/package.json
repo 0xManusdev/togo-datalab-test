@@ -4,8 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"start": "node -r tsconfig-paths/register dist/server.js",
-		"build": "tsc",
+		"start": "node dist/server.js",
+		"build": "tsc && tsc-alias",
 		"dev": "nodemon -r tsconfig-paths/register src/server.ts",
 		"test": "jest",
 		"test:watch": "jest --watch",
