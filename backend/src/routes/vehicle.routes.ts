@@ -11,9 +11,9 @@ const vehicleController = new VehicleController();
 
 router.use(authenticate);
 
-router.get('/', vehicleController.findAll);
 router.get('/available', vehicleController.findAvailable);
 router.get('/:id', validateUuidParam('id'), vehicleController.findById);
+router.get('/', authorizeAdmin, vehicleController.findAll);
 
 router.post('/', authorizeAdmin, validate(createVehicleSchema), vehicleController.create);
 router.put('/:id', authorizeAdmin, validateUuidParam('id'), validate(updateVehicleSchema), vehicleController.update);
