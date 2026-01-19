@@ -30,7 +30,8 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 		startDate &&
 		endDate &&
 		new Date(endDate) > new Date(startDate) &&
-		new Date(startDate) > new Date();
+		new Date(startDate) > new Date() &&
+		reason.trim().length >= 5;
 
 	const handleSubmit = async () => {
 		if (!canSubmit) return;
@@ -40,7 +41,7 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 				vehicleId: vehicle.id,
 				startDate: new Date(startDate).toISOString(),
 				endDate: new Date(endDate).toISOString(),
-				reason: reason.trim() || undefined,
+				reason: reason.trim(),
 			});
 
 			toast.success("Réservation confirmée !", {
@@ -122,7 +123,7 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 				<div className="space-y-2">
 					<Label htmlFor="reason" className="flex items-center gap-2">
 						<FileText className="h-4 w-4" />
-						Motif de la réservation
+						Motif de la réservation *
 					</Label>
 					<Textarea
 						id="reason"

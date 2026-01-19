@@ -24,6 +24,7 @@ export default function NewBookingPage() {
     const [step, setStep] = useState<Step>(preselectedVehicleId ? 2 : 1);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [reason, setReason] = useState("");
     const [selectedVehicleId, setSelectedVehicleId] = useState(
         preselectedVehicleId || ""
     );
@@ -50,6 +51,7 @@ export default function NewBookingPage() {
                 vehicleId: selectedVehicleId,
                 startDate: new Date(startDate).toISOString(),
                 endDate: new Date(endDate).toISOString(),
+                reason: reason.trim(),
             });
             router.push("/bookings");
         } catch (error) {
@@ -239,6 +241,22 @@ export default function NewBookingPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="reason">Motif de la réservation *</Label>
+                                <textarea
+                                    id="reason"
+                                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    placeholder="Ex: Déplacement pour mission à Kara du 20 au 22 janvier"
+                                    value={reason}
+                                    onChange={(e) => setReason(e.target.value)}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Minimum 5 caractères
+                                </p>
+                            </div>
+                        </div>
+
                         <div className="rounded-lg bg-muted p-4">
                             <h3 className="mb-4 font-semibold">Récapitulatif</h3>
                             <div className="space-y-3">
@@ -264,6 +282,12 @@ export default function NewBookingPage() {
                                     <span className="text-muted-foreground">Au</span>
                                     <span className="font-medium">{formatDateTime(endDate)}</span>
                                 </div>
+                                {reason && (
+                                    <div className="flex flex-col gap-1 pt-2 border-t">
+                                        <span className="text-muted-foreground">Motif</span>
+                                        <span className="font-medium text-sm">{reason}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -274,7 +298,7 @@ export default function NewBookingPage() {
                             </Button>
                             <Button
                                 onClick={handleSubmit}
-                                disabled={createBooking.isPending}
+                                disabled={createBooking.isPending || reason.trim().length < 5}
                             >
                                 {createBooking.isPending && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
