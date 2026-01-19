@@ -33,6 +33,11 @@ const mainNavItems = [
 		icon: Calendar,
 	},
 	{
+		title: "Calendrier",
+		href: "/bookings/calendar",
+		icon: CalendarDays,
+	},
+	{
 		title: "Mon profil",
 		href: "/profile",
 		icon: User,
@@ -44,11 +49,6 @@ const adminOnlyNavItems = [
 		title: "Tableau de bord",
 		href: "/",
 		icon: LayoutDashboard,
-	},
-	{
-		title: "Calendrier",
-		href: "/bookings/calendar",
-		icon: CalendarDays,
 	},
 ];
 
