@@ -49,7 +49,7 @@ export default function BookingsPage() {
                         Gérez vos réservations de véhicules
                     </p>
                 </div>
-                <Link href="/bookings/new">
+                <Link href="/book">
                     <Button>
                         <Calendar className="mr-2 h-4 w-4" />
                         Nouvelle réservation
@@ -105,7 +105,7 @@ export default function BookingsPage() {
                     <p className="text-muted-foreground">
                         Réservez un véhicule pour commencer
                     </p>
-                    <Link href="/bookings/new" className="mt-4">
+                    <Link href="/book" className="mt-4">
                         <Button>Nouvelle réservation</Button>
                     </Link>
                 </div>
