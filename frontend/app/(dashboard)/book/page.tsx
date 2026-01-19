@@ -13,6 +13,7 @@ import {
 	Clock,
 	ChevronRight,
 	X,
+	MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,7 @@ export default function BookPage() {
 	const [startDate, setStartDate] = useState<Date | undefined>(new Date());
 	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 	const [reason, setReason] = useState("");
+	const [destination, setDestination] = useState("");
 	const [hasSearched, setHasSearched] = useState(false);
 
 	const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -59,8 +61,8 @@ export default function BookPage() {
 		endDate > startDate &&
 		startDate > new Date();
 
-	// Validation pour confirmer la réservation (inclut le motif)
-	const canConfirm = canSearch && reason.trim().length >= 5;
+	// Validation pour confirmer la réservation (inclut le motif et la destination)
+	const canConfirm = canSearch && reason.trim().length >= 5 && destination.trim().length >= 2;
 
 	const {
 		data: vehiclesData,
@@ -80,6 +82,7 @@ export default function BookPage() {
 		setStartDate(undefined);
 		setEndDate(undefined);
 		setReason("");
+		setDestination("");
 		setHasSearched(false);
 		setSelectedVehicle(null);
 	};
@@ -93,6 +96,7 @@ export default function BookPage() {
 				startDate: startDateISO,
 				endDate: endDateISO,
 				reason: reason.trim(),
+				destination: destination.trim(),
 			});
 
 			toast.success("Réservation confirmée !", {
@@ -357,6 +361,24 @@ export default function BookPage() {
 								<span className="text-muted-foreground">Au</span>
 								<span className="font-medium">{formatDate(endDateISO)}</span>
 							</div>
+						</div>
+
+						{/* Destination Input */}
+						<div className="space-y-2">
+							<Label htmlFor="destination" className="flex items-center gap-2">
+								<MapPin className="h-4 w-4" />
+								Destination
+								<span className="text-destructive">*</span>
+							</Label>
+							<input
+								id="destination"
+								type="text"
+								placeholder="Ex: Kara, Sokodé, Lomé..."
+								value={destination}
+								onChange={(e) => setDestination(e.target.value)}
+								maxLength={200}
+								className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+							/>
 						</div>
 
 						{/* Reason Input */}
