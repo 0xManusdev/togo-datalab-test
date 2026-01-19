@@ -11,6 +11,7 @@ import { prisma } from './utils/prisma';
 import authRoutes from './routes/auth.routes';
 import vehicleRoutes from './routes/vehicle.routes';
 import bookingRoutes from './routes/booking.routes';
+import { config } from './config/environment';
 
 const app: Application = express();
 
@@ -18,7 +19,7 @@ app.set('trust proxy', 1);
 
 app.use(helmet());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: config.frontendUrl || 'http://localhost:3000',
     credentials: true
 }));
 
