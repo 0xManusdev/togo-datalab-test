@@ -24,6 +24,7 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
 	const [reason, setReason] = useState("");
+	const [destination, setDestination] = useState("");
 	const createBooking = useCreateBooking();
 
 	const canSubmit =
@@ -31,7 +32,8 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 		endDate &&
 		new Date(endDate) > new Date(startDate) &&
 		new Date(startDate) > new Date() &&
-		reason.trim().length >= 5;
+		reason.trim().length >= 5 &&
+		destination.trim().length >= 2;
 
 	const handleSubmit = async () => {
 		if (!canSubmit) return;
@@ -42,6 +44,7 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 				startDate: new Date(startDate).toISOString(),
 				endDate: new Date(endDate).toISOString(),
 				reason: reason.trim(),
+				destination: destination.trim(),
 			});
 
 			toast.success("Réservation confirmée !", {
@@ -52,6 +55,7 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 			setStartDate("");
 			setEndDate("");
 			setReason("");
+			setDestination("");
 			onClose();
 		} catch (error: unknown) {
 			const message =
@@ -68,6 +72,7 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 		setStartDate("");
 		setEndDate("");
 		setReason("");
+		setDestination("");
 		onClose();
 	};
 
@@ -119,6 +124,20 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 					</div>
 				</div>
 
+				{/* Destination */}
+				<div className="space-y-2">
+					<Label htmlFor="destination" className="flex items-center gap-2">
+						Destination *
+					</Label>
+					<Input
+						id="destination"
+						placeholder="Ex: Kara, Sokodé, Lomé..."
+						value={destination}
+						onChange={(e) => setDestination(e.target.value)}
+						maxLength={200}
+					/>
+				</div>
+
 				{/* Reason for booking */}
 				<div className="space-y-2">
 					<Label htmlFor="reason" className="flex items-center gap-2">
@@ -146,6 +165,11 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 						<p className="text-muted-foreground">
 							Du {formatDate(startDate)} au {formatDate(endDate)}
 						</p>
+						{destination.trim() && (
+							<p className="text-muted-foreground mt-1">
+								<span className="font-medium">Destination:</span> {destination}
+							</p>
+						)}
 						{reason.trim() && (
 							<p className="text-muted-foreground mt-1">
 								<span className="font-medium">Motif:</span> {reason}

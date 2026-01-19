@@ -5,6 +5,7 @@ export const createBookingSchema = z.object({
     startDate: z.string().datetime({ message: 'Date de début invalide' }),
     endDate: z.string().datetime({ message: 'Date de fin invalide' }),
     reason: z.string().min(5, 'Le motif doit contenir au moins 5 caractères').max(500, 'Le motif ne peut pas dépasser 500 caractères'),
+    destination: z.string().min(2, 'La destination doit contenir au moins 2 caractères').max(200, 'La destination ne peut pas dépasser 200 caractères'),
 }).refine(data => new Date(data.startDate) < new Date(data.endDate), {
     message: 'La date de fin doit être après la date de début',
     path: ['endDate']

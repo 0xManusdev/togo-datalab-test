@@ -25,6 +25,7 @@ export default function NewBookingPage() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [reason, setReason] = useState("");
+    const [destination, setDestination] = useState("");
     const [selectedVehicleId, setSelectedVehicleId] = useState(
         preselectedVehicleId || ""
     );
@@ -52,6 +53,7 @@ export default function NewBookingPage() {
                 startDate: new Date(startDate).toISOString(),
                 endDate: new Date(endDate).toISOString(),
                 reason: reason.trim(),
+                destination: destination.trim(),
             });
             router.push("/bookings");
         } catch (error) {
@@ -243,11 +245,23 @@ export default function NewBookingPage() {
                     <CardContent className="space-y-6">
                         <div className="space-y-4">
                             <div className="space-y-2">
+                                <Label htmlFor="destination">Destination *</Label>
+                                <Input
+                                    id="destination"
+                                    placeholder="Ex: Kara, Sokodé, Lomé..."
+                                    value={destination}
+                                    onChange={(e) => setDestination(e.target.value)}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Où allez-vous avec ce véhicule ?
+                                </p>
+                            </div>
+                            <div className="space-y-2">
                                 <Label htmlFor="reason">Motif de la réservation *</Label>
                                 <textarea
                                     id="reason"
                                     className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    placeholder="Ex: Déplacement pour mission à Kara du 20 au 22 janvier"
+                                    placeholder="Ex: Déplacement pour mission de supervision"
                                     value={reason}
                                     onChange={(e) => setReason(e.target.value)}
                                 />
@@ -286,6 +300,12 @@ export default function NewBookingPage() {
                                     <div className="flex flex-col gap-1 pt-2 border-t">
                                         <span className="text-muted-foreground">Motif</span>
                                         <span className="font-medium text-sm">{reason}</span>
+                                    </div>
+                                )}
+                                {destination && (
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Destination</span>
+                                        <span className="font-medium">{destination}</span>
                                     </div>
                                 )}
                             </div>
