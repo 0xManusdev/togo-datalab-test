@@ -56,11 +56,19 @@ export function DateTimePicker({
 	const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newTime = e.target.value
 		setTimeValue(newTime)
-		if (date) {
-			const [hours, minutes] = newTime.split(":").map(Number)
-			const newDate = new Date(date)
-			newDate.setHours(hours, minutes, 0, 0)
-			setDate(newDate)
+		
+		// Only update the date if we have a valid time format
+		if (date && newTime && newTime.includes(":")) {
+			const [hoursStr, minutesStr] = newTime.split(":")
+			const hours = parseInt(hoursStr, 10)
+			const minutes = parseInt(minutesStr, 10)
+			
+			// Only update if both values are valid numbers
+			if (!isNaN(hours) && !isNaN(minutes) && hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
+				const newDate = new Date(date)
+				newDate.setHours(hours, minutes, 0, 0)
+				setDate(newDate)
+			}
 		}
 	}
 
