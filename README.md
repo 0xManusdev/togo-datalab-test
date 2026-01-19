@@ -6,13 +6,14 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)
 
-> **Contexte** : Ce projet a été réalisé dans le cadre du test technique de recrutement pour le **Togo Data Lab**, sous la tutelle du Ministère de l'Efficacité du Service Public et de la Transformation Numérique.
+> **Contexte et Objectif** : Ce projet, réalisé dans le cadre du test technique de recrutement pour le **Togo Data Lab**, est une application web de gestion de réservation de véhicules dont l'objectif est de permettre aux utilisateurs de réserver des véhicules en fonction de leurs disponibilités tout en empêchant les conflits d'usage ou chevauchement de réservations, garantissant ainsi la continuité des missions.
+
+
 
 ---
 
 ## 📋 Table des Matières
 
-- [À Propos du Projet](#-à-propos-du-projet)
 - [Démarrage Rapide](#-démarrage-rapide)
 - [Architecture et Choix Techniques](#-architecture-et-choix-techniques)
 - [Choix Fonctionnels et Algorithmiques](#-choix-fonctionnels-et-algorithmiques)
@@ -24,12 +25,6 @@
 - [Perspectives d'Évolution](#-perspectives-dévolution)
 
 ---
-
-## 📖 À Propos du Projet
-
-L'objectif de ce projet est de développer une solution numérique robuste et sécurisée pour la gestion du parc automobile de l'entreprise tout en empêchant les conflits d'usage ou chevauchement de réservations, garantissant ainsi la continuité des missions.
-
-L'application permet aux employés de s'authentifier, de consulter les disponibilités en temps réel et de réserver des véhicules en autonomie, tout en offrant aux administrateurs une traçabilité complète des opérations.
 
 ### Schéma d'Architecture
 
@@ -132,13 +127,6 @@ Afin de respecter la contrainte stricte d'intégrité des données, le cœur du 
 - **Logique Mathématique** : Vérification des intersections d'intervalles basée sur la logique : `(StartA < EndB) ET (EndA > StartB)`.
 - **Sécurité de Concurrence** : Implémentation de **transactions SGBD** couplées à un verrouillage optimiste lors de la création d'une réservation. Cela garantit mathématiquement qu'il est impossible que deux utilisateurs réservent le même véhicule sur le même créneau simultanément (prévention des *Race Conditions*).
 
-```typescript
-// Extrait simplifié de la logique anti-chevauchement
-const hasOverlap = existingBookings.some(booking => 
-    startDate < booking.endDate && endDate > booking.startDate
-);
-```
-
 ---
 
 ## ✨ Fonctionnalités Principales
@@ -165,7 +153,7 @@ const hasOverlap = existingBookings.some(booking =>
 
 ## 🛠️ Installation et Lancement
 
-Suivez ces instructions détaillées pour lancer le projet localement.
+Pour installer et exécuter le projet localement, suivez ces instructions détaillées.
 
 ### Prérequis
 
@@ -195,8 +183,8 @@ DATABASE_URL="postgresql://user:password@localhost:5432/vehicle_booking"
 # Secret JWT (générez une clé sécurisée)
 JWT_SECRET="votre_secret_tres_securise_minimum_32_caracteres"
 
-# Port du serveur (optionnel, défaut: 3001)
-PORT=3001
+# Port du serveur (optionnel, défaut: 8000)
+PORT=8000
 ```
 
 ```bash
@@ -226,7 +214,7 @@ cp .env.example .env
 
 ```env
 # URL de l'API Backend
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
 ```
 
 ```bash
@@ -239,7 +227,7 @@ npm run dev
 | Service | URL |
 |---------|-----|
 | **Frontend** | http://localhost:3000 |
-| **Backend API** | http://localhost:3001/api |
+| **Backend API** | http://localhost:8000/api |
 
 ---
 
@@ -345,8 +333,8 @@ hooks/              # Hooks React personnalisés
 
 Pour une mise en production à l'échelle institutionnelle, les axes d'amélioration suivants sont identifiés :
 
-- **🐳 Containerisation (Docker)** : Mise en place de Docker et Docker Compose pour faciliter le déploiement CI/CD sur les infrastructures du Data Lab.
-- **📧 Système de Notifications** : Intégration d'un service d'envoi d'emails (SMTP/SendGrid) pour les confirmations de réservation et les rappels.
-- **📊 Module Analytique** : Développement d'un tableau de bord statistique pour suivre le taux d'utilisation des véhicules et optimiser la taille du parc.
-- **📱 Application Mobile** : Développement d'une application React Native pour permettre les réservations en mobilité.
-- **🔄 Intégration Calendrier** : Synchronisation avec Google Calendar / Outlook pour une meilleure visibilité des réservations.
+- **Containerisation (Docker)** : Mise en place de Docker et Docker Compose pour faciliter le déploiement CI/CD sur les infrastructures de l'entreprise.
+- **Système de Notifications** : Intégration d'un service d'envoi d'emails (SMTP/SendGrid) pour les confirmations de réservation et les rappels.
+- **Module Analytique** : Développement d'un tableau de bord statistique pour suivre le taux d'utilisation des véhicules et optimiser la taille du parc.
+- **Application Mobile** : Développement d'une application React Native pour permettre les réservations en mobilité.
+- **Intégration Calendrier** : Synchronisation avec Google Calendar ou Outlook pour une meilleure visibilité des réservations.
