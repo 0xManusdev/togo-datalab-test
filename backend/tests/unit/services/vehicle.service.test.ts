@@ -1,5 +1,5 @@
-import { VehicleService } from '@/services/vehicle.service';
-import { ConflictError, NotFoundError } from '@/errors/AppError';
+import { VehicleService } from '../../../src/services/vehicle.service';
+import { ConflictError, NotFoundError } from '../../../src/errors/AppError';
 import { mockPrisma } from '../../setup';
 
 describe('VehicleService', () => {

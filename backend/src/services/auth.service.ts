@@ -71,7 +71,6 @@ export class AuthService {
             where: { email } 
         });
 
-        // Message générique pour éviter l'énumération d'utilisateurs
         if (!user) {
             throw new UnauthorizedError('Identifiants incorrects.');
         }

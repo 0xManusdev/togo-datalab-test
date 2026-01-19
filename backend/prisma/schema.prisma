@@ -57,6 +57,7 @@ model Booking {
 
     startDate DateTime
     endDate   DateTime
+    reason    String?
 
     status BookingStatus @default(CONFIRMED)
 

@@ -5,16 +5,33 @@ import { createPaginatedResponse } from '../utils/pagination';
 
 export class VehicleService {
     async findAll(page: number = 1, limit: number = 20) {
+        const now = new Date();
+        
         const [vehicles, total] = await Promise.all([
             prisma.vehicle.findMany({
                 orderBy: { createdAt: 'desc' },
                 skip: (page - 1) * limit,
                 take: limit,
+                include: {
+                    bookings: {
+                        where: {
+                            status: 'CONFIRMED',
+                            startDate: { lte: now },
+                            endDate: { gte: now }
+                        },
+                        select: { id: true, startDate: true, endDate: true }
+                    }
+                }
             }),
             prisma.vehicle.count()
         ]);
 
-        return createPaginatedResponse(vehicles, total, page, limit);
+        const vehiclesWithStatus = vehicles.map(vehicle => ({
+            ...vehicle,
+            currentlyBooked: vehicle.bookings.length > 0
+        }));
+
+        return createPaginatedResponse(vehiclesWithStatus, total, page, limit);
     }
 
     async findAvailable(startDate: Date, endDate: Date) {

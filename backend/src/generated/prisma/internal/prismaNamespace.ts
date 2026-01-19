@@ -702,6 +702,7 @@ export const BookingScalarFieldEnum = {
   vehicleId: 'vehicleId',
   startDate: 'startDate',
   endDate: 'endDate',
+  reason: 'reason',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

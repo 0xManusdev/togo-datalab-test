@@ -93,7 +93,7 @@ export class BookingService {
         return prisma.$transaction(async (tx) => {
             const vehicles = await tx.$queryRaw<Vehicle[]>`
                 SELECT * FROM "Vehicle" 
-                WHERE id = ${data.vehicleId}::uuid 
+                WHERE id = ${data.vehicleId}
                 FOR UPDATE
             `;
 
@@ -126,6 +126,7 @@ export class BookingService {
                     userId,
                     startDate,
                     endDate,
+                    reason: data.reason,
                     status: 'CONFIRMED'
                 },
                 include: {
