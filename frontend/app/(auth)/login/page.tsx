@@ -46,7 +46,7 @@ export default function LoginPage() {
             if (user.role === "ADMIN") {
                 router.push("/");
             } else {
-                router.push("/bookings");
+                router.push("/book");
             }
         } catch (err) {
             if (err instanceof ApiError) {
