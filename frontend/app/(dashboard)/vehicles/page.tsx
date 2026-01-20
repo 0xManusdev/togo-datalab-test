@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Car, Plus, Search, CalendarPlus } from "lucide-react";
+import { Car, Plus, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Pagination } from "@/components/ui/pagination";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { SearchInput } from "@/components/ui/search-input";
+import { VehicleCard } from "@/components/vehicles/vehicle-card";
 import { useVehicles } from "@/hooks/useVehicles";
 import { useAuth } from "@/hooks/useAuth";
+import { ROUTES } from "@/lib/constants";
 
 export default function VehiclesPage() {
 	const { user } = useAuth();
@@ -39,14 +43,14 @@ export default function VehiclesPage() {
 					</p>
 				</div>
 				<div className="grid grid-cols-2 gap-2">
-					<Link href="/book">
+					<Link href={ROUTES.BOOK}>
 						<Button className="w-full cursor-pointer text-xs">
 							<CalendarPlus className="mr-1 h-4 w-4" />
 							Réserver
 						</Button>
 					</Link>
 					{isAdmin && (
-						<Link href="/vehicles/new">
+						<Link href={ROUTES.VEHICLES_NEW}>
 							<Button variant="outline" className="w-full cursor-pointer text-xs">
 								<Plus className="mr-1 h-4 w-4" />
 								Ajouter
@@ -56,15 +60,13 @@ export default function VehiclesPage() {
 				</div>
 			</div>
 
-			<div className="relative max-w-md">
-				<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-				<Input
-					placeholder="Rechercher par marque, modèle ou plaque..."
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-					className="pl-10"
-				/>
-			</div>
+
+			<SearchInput
+				value={search}
+				onChange={setSearch}
+				placeholder="Rechercher par marque, modèle ou plaque..."
+				className="max-w-md"
+			/>
 
 			{isLoading ? (
 				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -82,96 +84,29 @@ export default function VehiclesPage() {
 					))}
 				</div>
 			) : filteredVehicles.length === 0 ? (
-				<div className="flex flex-col items-center justify-center py-16">
-					<Car className="h-16 w-16 text-muted-foreground/50" />
-					<h3 className="mt-4 text-lg font-medium">Aucun véhicule trouvé</h3>
-					<p className="text-muted-foreground">
-						{search
-							? "Essayez une autre recherche"
-							: "Le parc automobile est vide"}
-					</p>
-				</div>
+				<EmptyState
+					icon={Car}
+					title="Aucun véhicule trouvé"
+					description={search ? "Essayez une autre recherche" : "Le parc automobile est vide"}
+				/>
 			) : (
 				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{filteredVehicles.map((vehicle) => (
-						<Card key={vehicle.id} className="overflow-hidden">
-							<div className="flex h-40 items-center justify-center bg-muted">
-								{vehicle.imageUrl ? (
-									<img
-										src={vehicle.imageUrl}
-										alt={`${vehicle.brand} ${vehicle.model}`}
-										className="h-full w-full object-cover"
-									/>
-								) : (
-									<Car className="h-16 w-16 text-muted-foreground/50" />
-								)}
-							</div>
-							<CardContent className="pt-4">
-								<div className="flex items-start justify-between">
-									<div>
-										<h1 className="font-semibold text-sm">
-											{vehicle.brand} {vehicle.model}
-										</h1>
-										<p className="text-sm text-muted-foreground">
-											{vehicle.licensePlate}
-										</p>
-									</div>
-									<Badge 
-										className="text-[10px] font-light"
-										variant={
-											vehicle.currentlyBooked 
-												? "destructive" 
-												: vehicle.isAvailable 
-													? "success" 
-													: "secondary"
-										}
-									>
-										{vehicle.currentlyBooked 
-											? "Réservé" 
-											: vehicle.isAvailable 
-												? "Disponible" 
-												: "Indisponible"}
-									</Badge>
-								</div>
-							</CardContent>
-							<CardFooter>
-								<Link href={`/vehicles/${vehicle.id}`} className="w-full">
-									<Button variant="outline" className="w-full cursor-pointer">
-										Voir détails
-									</Button>
-								</Link>
-							</CardFooter>
-						</Card>
+						<VehicleCard key={vehicle.id} vehicle={vehicle} />
 					))}
 				</div>
 			)}
 
 			{/* Pagination */}
-			{pagination && pagination.totalPages > 1 && (
-				<div className="flex items-center justify-center gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						disabled={!pagination.hasPrevPage}
-						onClick={() => setPage(page - 1)}
-					>
-						Précédent
-					</Button>
-					<span className="text-sm text-muted-foreground">
-						Page {pagination.page} sur {pagination.totalPages}
-					</span>
-					<Button
-						variant="outline"
-						size="sm"
-						disabled={!pagination.hasNextPage}
-						onClick={() => setPage(page + 1)}
-					>
-						Suivant
-					</Button>
-				</div>
+			{pagination && (
+				<Pagination
+					page={pagination.page}
+					totalPages={pagination.totalPages}
+					hasNextPage={pagination.hasNextPage}
+					hasPrevPage={pagination.hasPrevPage}
+					onPageChange={setPage}
+				/>
 			)}
 		</div>
 	);
 }
-
-

@@ -46,6 +46,20 @@ export function useCreateBooking() {
   });
 }
 
+export function useUpdateBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...data }: { id: string } & Partial<CreateBookingInput>) =>
+      api.patch<ApiResponse<BookingWithDetails>>(`/bookings/${id}`, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings", id] });
+      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+    },
+  });
+}
+
 export function useCancelBooking() {
   const queryClient = useQueryClient();
 

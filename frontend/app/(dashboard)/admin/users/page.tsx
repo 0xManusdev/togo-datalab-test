@@ -7,11 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Modal } from "@/components/ui/modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useUsers, useCreateUser, useDeleteUser, CreateUserInput } from "@/hooks/useUsers";
-import { formatDate } from "@/lib/utils";
+import { handleError } from "@/lib/error-handler";
 import { toast } from "sonner";
 
 export default function AdminUsersPage() {
@@ -21,6 +24,7 @@ export default function AdminUsersPage() {
 	const deleteUser = useDeleteUser();
 
 	const [showCreateModal, setShowCreateModal] = useState(false);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [userToDelete, setUserToDelete] = useState<string | null>(null);
 	const [formData, setFormData] = useState<CreateUserInput>({
 		email: "",
@@ -33,13 +37,11 @@ export default function AdminUsersPage() {
 
 	if (currentUser?.role !== "ADMIN") {
 		return (
-			<div className="flex flex-col items-center justify-center py-16">
-				<Shield className="h-16 w-16 text-muted-foreground/50" />
-				<h3 className="mt-4 text-lg font-medium">Accès refusé</h3>
-				<p className="text-muted-foreground">
-					Cette page est réservée aux administrateurs
-				</p>
-			</div>
+			<EmptyState
+				icon={Shield}
+				title="Accès refusé"
+				description="Cette page est réservée aux administrateurs"
+			/>
 		);
 	}
 
@@ -59,8 +61,8 @@ export default function AdminUsersPage() {
 				phone: "",
 				role: "EMPLOYEE",
 			});
-		} catch {
-			toast.error("Erreur lors de la création");
+		} catch (error) {
+			handleError(error, "Création impossible");
 		}
 	};
 
@@ -70,25 +72,29 @@ export default function AdminUsersPage() {
 			await deleteUser.mutateAsync(userToDelete);
 			toast.success("Utilisateur supprimé");
 			setUserToDelete(null);
-		} catch {
-			toast.error("Erreur lors de la suppression");
+			setShowDeleteModal(false);
+		} catch (error) {
+			handleError(error, "Suppression impossible");
 		}
+	};
+
+	const openDeleteModal = (userId: string) => {
+		setUserToDelete(userId);
+		setShowDeleteModal(true);
 	};
 
 	return (
 		<div className="space-y-6">
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-2xl font-bold">Gestion des utilisateurs</h1>
-					<p className="text-muted-foreground">
-						Gérez les utilisateurs de la plateforme
-					</p>
-				</div>
-				<Button onClick={() => setShowCreateModal(true)}>
-					<Plus className="mr-2 h-4 w-4" />
-					Nouvel utilisateur
-				</Button>
-			</div>
+			<PageHeader
+				title="Gestion des utilisateurs"
+				description="Gérez les utilisateurs de la plateforme"
+				action={
+					<Button onClick={() => setShowCreateModal(true)}>
+						<Plus className="mr-2 h-4 w-4" />
+						Nouvel utilisateur
+					</Button>
+				}
+			/>
 
 			<Card>
 				<CardHeader>
@@ -99,19 +105,14 @@ export default function AdminUsersPage() {
 				</CardHeader>
 				<CardContent>
 					{isLoading ? (
-						<div className="space-y-4">
-							{[1, 2, 3].map((i) => (
-								<Skeleton key={i} className="h-16 w-full" />
-							))}
-						</div>
+						<TableSkeleton rows={3} height="h-16" />
 					) : users.length === 0 ? (
-						<div className="flex flex-col items-center justify-center py-12">
-							<Users className="h-16 w-16 text-muted-foreground/50" />
-							<h3 className="mt-4 text-lg font-medium">Aucun utilisateur</h3>
-							<p className="text-muted-foreground">
-								Commencez par créer un utilisateur
-							</p>
-						</div>
+						<EmptyState
+							icon={Users}
+							title="Aucun utilisateur"
+							description="Commencez par créer un utilisateur"
+							className="py-12"
+						/>
 					) : (
 						<div className="rounded-lg border">
 							<div className="border-b px-4 py-3">
@@ -138,18 +139,16 @@ export default function AdminUsersPage() {
 										<span className="text-sm text-muted-foreground">
 											{user.phone || "-"}
 										</span>
-										<Badge
-											variant={user.role === "ADMIN" ? "default" : "secondary"}
-										>
+										<span className="text-sm text-muted-foreground">
 											{user.role === "ADMIN" ? "Admin" : "Employé"}
-										</Badge>
+										</span>
 										<div>
 											{user.id !== currentUser?.id && (
 												<Button
 													variant="ghost"
 													size="icon"
 													className="text-destructive hover:text-destructive"
-													onClick={() => setUserToDelete(user.id)}
+													onClick={() => openDeleteModal(user.id)}
 												>
 													<Trash2 className="h-4 w-4" />
 												</Button>
@@ -271,25 +270,20 @@ export default function AdminUsersPage() {
 			</Modal>
 
 			{/* Delete Confirmation Modal */}
-			<Modal
-				isOpen={!!userToDelete}
-				onClose={() => setUserToDelete(null)}
+			<ConfirmDialog
+				isOpen={showDeleteModal}
+				onClose={() => {
+					setShowDeleteModal(false);
+					setUserToDelete(null);
+				}}
+				onConfirm={handleDeleteUser}
 				title="Supprimer cet utilisateur ?"
 				description="Cette action est irréversible."
-			>
-				<div className="flex justify-end gap-3 mt-6">
-					<Button variant="outline" onClick={() => setUserToDelete(null)}>
-						Annuler
-					</Button>
-					<Button
-						variant="destructive"
-						onClick={handleDeleteUser}
-						disabled={deleteUser.isPending}
-					>
-						{deleteUser.isPending ? "Suppression..." : "Supprimer"}
-					</Button>
-				</div>
-			</Modal>
+				confirmText="Supprimer"
+				variant="destructive"
+				isLoading={deleteUser.isPending}
+			/>
 		</div>
 	);
 }
+

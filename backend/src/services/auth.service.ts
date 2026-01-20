@@ -8,61 +8,7 @@ import { AppError, ConflictError, UnauthorizedError } from '@/errors/AppError';
 
 export class AuthService {
 
-    async register(data: RegisterDTO) {
-        const { email, password, firstName, lastName, phone } = data;
-
-        const existingUser = await prisma.user.findUnique({ 
-            where: { email } 
-        });
-
-        if (existingUser) {
-            throw new ConflictError('Un utilisateur avec cette adresse email existe déjà.');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                firstName,
-                lastName,
-                phone,
-                role: 'EMPLOYEE',
-            },
-        });
-
-        const { password: _, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-    }
-
-    async registerAdmin(data: RegisterDTO) {
-        const { email, password, firstName, lastName, phone } = data;
-
-        const existingUser = await prisma.user.findUnique({ 
-            where: { email } 
-        });
-
-        if (existingUser) {
-            throw new ConflictError('Un administrateur avec cette adresse email existe déjà.');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                firstName,
-                lastName,
-                phone,
-                role: 'ADMIN',
-            },
-        });
-
-        const { password: _, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-    }
+    // Methods register and registerAdmin removed as per audit cleanup (dead code)
 
     async login(data: LoginDTO) {
         const { email, password } = data;

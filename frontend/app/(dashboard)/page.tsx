@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Car, Calendar, CalendarCheck, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatsCard } from "@/components/ui/stats-card";
 import { useAuth } from "@/hooks/useAuth";
 import { useBookings } from "@/hooks/useBookings";
 import { useVehicles } from "@/hooks/useVehicles";
@@ -11,37 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-
-function StatsCard({
-    title,
-    value,
-    description,
-    icon: Icon,
-    loading,
-}: {
-    title: string;
-    value: string | number;
-    description: string;
-    icon: React.ElementType;
-    loading?: boolean;
-}) {
-    return (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                {loading ? (
-                    <Skeleton className="h-8 w-20" />
-                ) : (
-                    <div className="text-2xl font-bold">{value}</div>
-                )}
-                <p className="text-xs text-muted-foreground">{description}</p>
-            </CardContent>
-        </Card>
-    );
-}
+import { ROUTES } from "@/lib/constants";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -78,9 +49,7 @@ export default function DashboardPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold">
-                    Voici un aperçu de votre parc automobile
-                </h1>
+                <h1 className="text-2xl font-bold">Aperçu du parc</h1>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -174,7 +143,6 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
 
-                {/* Available Vehicles */}
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-lg">Véhicules disponibles</CardTitle>
@@ -204,17 +172,12 @@ export default function DashboardPage() {
                                         className="flex items-center justify-between rounded-lg border p-4"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/10 text-green-600">
-                                                <Car className="h-6 w-6" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">
-                                                    {vehicle.brand} {vehicle.model}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {vehicle.licensePlate}
-                                                </p>
-                                            </div>
+                                            <p className="font-medium">
+                                                {vehicle.brand} {vehicle.model}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {vehicle.licensePlate}
+                                            </p>
                                         </div>
                                         <Badge variant="success">Disponible</Badge>
                                     </div>

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUIStore } from "@/stores/useUIStore";
 import { cn } from "@/lib/utils";
 import { Loader } from "lucide-react";
+import { ROUTES } from "@/lib/constants";
 
 export default function DashboardLayout({
     children,
@@ -20,7 +21,7 @@ export default function DashboardLayout({
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
-            router.push("/login");
+            router.push(ROUTES.LOGIN);
         }
     }, [isLoading, isAuthenticated, router]);
 

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateBooking } from "@/hooks/useBookings";
 import { formatDate } from "@/lib/utils";
+import { handleError } from "@/lib/error-handler";
 import { Vehicle } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -41,8 +42,9 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 		try {
 			await createBooking.mutateAsync({
 				vehicleId: vehicle.id,
-				startDate: new Date(startDate).toISOString(),
-				endDate: new Date(endDate).toISOString(),
+				// Treat local input time as UTC
+				startDate: new Date(startDate + ":00.000Z").toISOString(),
+				endDate: new Date(endDate + ":00.000Z").toISOString(),
 				reason: reason.trim(),
 				destination: destination.trim(),
 			});
@@ -57,13 +59,7 @@ export function BookingModal({ isOpen, onClose, vehicle }: BookingModalProps) {
 			setDestination("");
 			onClose();
 		} catch (error: unknown) {
-			const message =
-				error instanceof Error
-					? error.message
-					: "Une erreur est survenue lors de la réservation";
-			toast.error("Échec de la réservation", {
-				description: message,
-			});
+			handleError(error, "Échec de la réservation");
 		}
 	};
 

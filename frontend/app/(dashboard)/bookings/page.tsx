@@ -2,60 +2,85 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calendar, Car, Clock, Filter, X } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Pagination } from "@/components/ui/pagination";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { useBookings, useCancelBooking } from "@/hooks/useBookings";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDate, formatDateTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
+import { handleError } from "@/lib/error-handler";
+import { ROUTES } from "@/lib/constants";
 import { BookingStatus } from "@/types";
+import { SortableHeader } from "@/components/ui/sortable-header";
+import { BookingActions } from "@/components/booking/BookingActions";
 
 export default function BookingsPage() {
     const { user } = useAuth();
     const [page, setPage] = useState(1);
     const [statusFilter, setStatusFilter] = useState<BookingStatus | "ALL">("ALL");
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
+
     const { data, isLoading } = useBookings(page, 20);
-    const cancelBooking = useCancelBooking();
 
     const isAdmin = user?.role === "ADMIN";
     const bookings = data?.data || [];
     const pagination = data?.pagination;
 
+    // Filter
     const filteredBookings =
         statusFilter === "ALL"
             ? bookings
             : bookings.filter((b) => b.status === statusFilter);
 
-    const handleCancel = async (id: string) => {
-        if (!confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")) return;
-        try {
-            await cancelBooking.mutateAsync(id);
-        } catch (error) {
-            alert("Erreur lors de l'annulation");
+    // Sort
+    const sortedBookings = [...filteredBookings].sort((a, b) => {
+        if (!sortConfig) return 0;
+
+        const { key, direction } = sortConfig;
+        let aValue: any = a;
+        let bValue: any = b;
+
+        // Handle nested properties (e.g. vehicle.brand)
+        const keys = key.split(".");
+        for (const k of keys) {
+            aValue = aValue?.[k];
+            bValue = bValue?.[k];
         }
+
+        if (aValue < bValue) return direction === "asc" ? -1 : 1;
+        if (aValue > bValue) return direction === "asc" ? 1 : -1;
+        return 0;
+    });
+
+    const handleSort = (key: string) => {
+        setSortConfig((current) => {
+            if (current?.key === key) {
+                return { key, direction: current.direction === "asc" ? "desc" : "asc" };
+            }
+            return { key, direction: "asc" };
+        });
     };
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold">
-                        {isAdmin ? "Toutes les réservations" : "Mes réservations"}
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Gérez vos réservations de véhicules
-                    </p>
-                </div>
-                <Link href="/book">
-                    <Button>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Nouvelle réservation
-                    </Button>
-                </Link>
-            </div>
+            <PageHeader
+                title={isAdmin ? "Toutes les réservations" : "Mes réservations"}
+                description="Gérez vos réservations de véhicules"
+                action={
+                    <Link href={ROUTES.BOOK}>
+                        <Button>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            Nouvelle réservation
+                        </Button>
+                    </Link>
+                }
+            />
 
             <div className="flex gap-2">
                 <Button
@@ -82,22 +107,18 @@ export default function BookingsPage() {
             </div>
 
             {isLoading ? (
-                <div className="space-y-4">
-                    {[1, 2, 3, 4].map((i) => (
-                        <Skeleton key={i} className="h-12 w-full" />
-                    ))}
-                </div>
-            ) : filteredBookings.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16">
-                    <Calendar className="h-16 w-16 text-muted-foreground/50" />
-                    <h3 className="mt-4 text-lg font-medium">Aucune réservation</h3>
-                    <p className="text-muted-foreground">
-                        Réservez un véhicule pour commencer
-                    </p>
-                    <Link href="/book" className="mt-4">
-                        <Button>Nouvelle réservation</Button>
-                    </Link>
-                </div>
+                <TableSkeleton rows={4} />
+            ) : sortedBookings.length === 0 ? (
+                <EmptyState
+                    icon={Calendar}
+                    title="Aucune réservation"
+                    description="Réservez un véhicule pour commencer"
+                    action={
+                        <Link href={ROUTES.BOOK}>
+                            <Button>Nouvelle réservation</Button>
+                        </Link>
+                    }
+                />
             ) : (
                 <Card>
                     <CardContent className="p-0">
@@ -105,82 +126,103 @@ export default function BookingsPage() {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b text-left text-muted-foreground">
-                                        <th className="p-4 font-medium">Véhicule</th>
-                                        {isAdmin && <th className="p-4 font-medium">Utilisateur</th>}
-                                        <th className="p-4 font-medium">Destination</th>
-                                        <th className="p-4 font-medium">Période</th>
-                                        <th className="p-4 font-medium">Statut</th>
+                                        <th className="p-4 font-medium">
+                                            <SortableHeader
+                                                column="vehicle.brand"
+                                                label="Véhicule"
+                                                sortedColumn={sortConfig?.key || null}
+                                                sortDirection={sortConfig?.direction || "asc"}
+                                                onSort={handleSort}
+                                            />
+                                        </th>
+                                        {isAdmin && (
+                                            <th className="p-4 font-medium">
+                                                <SortableHeader
+                                                    column="user.lastName"
+                                                    label="Utilisateur"
+                                                    sortedColumn={sortConfig?.key || null}
+                                                    sortDirection={sortConfig?.direction || "asc"}
+                                                    onSort={handleSort}
+                                                />
+                                            </th>
+                                        )}
+                                        <th className="p-4 font-medium">
+                                            <SortableHeader
+                                                column="destination"
+                                                label="Destination"
+                                                sortedColumn={sortConfig?.key || null}
+                                                sortDirection={sortConfig?.direction || "asc"}
+                                                onSort={handleSort}
+                                            />
+                                        </th>
+                                        <th className="p-4 font-medium">
+                                            <SortableHeader
+                                                column="startDate"
+                                                label="Période"
+                                                sortedColumn={sortConfig?.key || null}
+                                                sortDirection={sortConfig?.direction || "asc"}
+                                                onSort={handleSort}
+                                            />
+                                        </th>
+                                        <th className="p-4 font-medium">
+                                            <SortableHeader
+                                                column="status"
+                                                label="Statut"
+                                                sortedColumn={sortConfig?.key || null}
+                                                sortDirection={sortConfig?.direction || "asc"}
+                                                onSort={handleSort}
+                                            />
+                                        </th>
                                         <th className="p-4 font-medium">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
-                                    {filteredBookings.map((booking) => {
-                                        const isUpcoming = new Date(booking.startDate) > new Date();
-                                        const canCancel = booking.status === "CONFIRMED" && isUpcoming;
-
-                                        return (
-                                            <tr key={booking.id} className="hover:bg-muted/50">
+                                    {sortedBookings.map((booking) => (
+                                        <tr key={booking.id} className="hover:bg-muted/50">
+                                            <td className="p-4">
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {booking.vehicle.brand} {booking.vehicle.model}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {booking.vehicle.licensePlate}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            {isAdmin && (
                                                 <td className="p-4">
-                                                    <div>
-                                                        <p className="font-medium">
-                                                            {booking.vehicle.brand} {booking.vehicle.model}
-                                                        </p>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {booking.vehicle.licensePlate}
-                                                        </p>
-                                                    </div>
+                                                    {booking.user.firstName} {booking.user.lastName}
                                                 </td>
-                                                {isAdmin && (
-                                                    <td className="p-4">
-                                                        {booking.user.firstName} {booking.user.lastName}
-                                                    </td>
-                                                )}
-                                                <td className="p-4 text-muted-foreground">
-                                                    {booking.destination || "-"}
-                                                </td>
-                                                <td className="p-4 whitespace-nowrap">
-                                                    <div className="text-sm">
-                                                        <p>{formatDate(booking.startDate)}</p>
-                                                        <p className="text-muted-foreground">
-                                                            au {formatDate(booking.endDate)}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                                <td className="p-4">
-                                                    <Badge
-                                                        variant={
-                                                            booking.status === "CONFIRMED"
-                                                                ? "success"
-                                                                : "secondary"
-                                                        }
-                                                    >
-                                                        {booking.status === "CONFIRMED"
-                                                            ? "Confirmée"
-                                                            : "Annulée"}
-                                                    </Badge>
-                                                </td>
-                                                <td className="p-4">
-                                                    <div className="flex gap-2">
-                                                        <Link href={`/bookings/${booking.id}`}>
-                                                            <Button variant="outline" size="sm">
-                                                                Détails
-                                                            </Button>
-                                                        </Link>
-                                                        {canCancel && (
-                                                            <Button
-                                                                variant="destructive"
-                                                                size="sm"
-                                                                onClick={() => handleCancel(booking.id)}
-                                                                disabled={cancelBooking.isPending}
-                                                            >
-                                                                Annuler
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                            )}
+                                            <td className="p-4 text-muted-foreground">
+                                                {booking.destination || "-"}
+                                            </td>
+                                            <td className="p-4 whitespace-nowrap">
+                                                <div className="text-sm">
+                                                    <p>{formatDate(booking.startDate)}</p>
+                                                    <p className="text-muted-foreground">
+                                                        au {formatDate(booking.endDate)}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <Badge
+                                                    variant={
+                                                        booking.status === "CONFIRMED"
+                                                            ? "success"
+                                                            : "secondary"
+                                                    }
+                                                >
+                                                    {booking.status === "CONFIRMED"
+                                                        ? "Confirmée"
+                                                        : "Annulée"}
+                                                </Badge>
+                                            </td>
+                                            <td className="p-4">
+                                                <BookingActions booking={booking} isAdmin={isAdmin} />
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -189,29 +231,16 @@ export default function BookingsPage() {
             )}
 
             {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={!pagination.hasPrevPage}
-                        onClick={() => setPage(page - 1)}
-                    >
-                        Précédent
-                    </Button>
-                    <span className="text-sm text-muted-foreground">
-                        Page {pagination.page} sur {pagination.totalPages}
-                    </span>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={!pagination.hasNextPage}
-                        onClick={() => setPage(page + 1)}
-                    >
-                        Suivant
-                    </Button>
-                </div>
+            {pagination && (
+                <Pagination
+                    page={pagination.page}
+                    totalPages={pagination.totalPages}
+                    hasNextPage={pagination.hasNextPage}
+                    hasPrevPage={pagination.hasPrevPage}
+                    onPageChange={setPage}
+                />
             )}
         </div>
     );
 }
+

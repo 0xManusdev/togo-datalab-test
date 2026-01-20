@@ -12,46 +12,6 @@ export class AuthController {
         this.authService = new AuthService();
     }
 
-    public register = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const response = await this.authService.register(req.body);
-            res.status(201).json({
-                status: 'success',
-                message: 'Inscription réussie',
-                data: response
-            });
-        } catch (error) {
-            if (error instanceof AppError) {
-                res.status(error.statusCode).json({ 
-                    status: 'error',
-                    message: error.message 
-                });
-                return;
-            }
-            next(error);
-        }
-    }
-
-    public registerAdmin = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const response = await this.authService.registerAdmin(req.body);
-            res.status(201).json({
-                status: 'success',
-                message: 'Administrateur ajouté !',
-                data: response
-            });
-        } catch (error) {
-            if (error instanceof AppError) {
-                res.status(error.statusCode).json({ 
-                    status: 'error',
-                    message: error.message 
-                });
-                return;
-            }
-            next(error);
-        }
-    }
-
     public login = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { user, token } = await this.authService.login(req.body);

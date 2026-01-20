@@ -2,73 +2,18 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-	LayoutDashboard,
-	Car,
-	Calendar,
-	CalendarDays,
-	CalendarPlus,
-	Users,
-	Settings,
-	ChevronLeft,
-	ChevronRight,
-	User,
-	LogOut,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUIStore } from "@/stores/useUIStore";
-
-const mainNavItems = [
-	{
-		title: "Réserver",
-		href: "/book",
-		icon: CalendarPlus,
-	},
-	{
-		title: "Mes réservations",
-		href: "/bookings",
-		icon: Calendar,
-	},
-	{
-		title: "Calendrier",
-		href: "/bookings/calendar",
-		icon: CalendarDays,
-	},
-	{
-		title: "Mon profil",
-		href: "/profile",
-		icon: User,
-	},
-];
-
-const adminOnlyNavItems = [
-	{
-		title: "Tableau de bord",
-		href: "/",
-		icon: LayoutDashboard,
-	},
-];
-
-const adminNavItems = [
-	{
-		title: "Véhicules",
-		href: "/vehicles",
-		icon: Car,
-	},
-	{
-		title: "Utilisateurs",
-		href: "/admin/users",
-		icon: Users,
-	},
-	// {
-	// 	title: "Paramètres",
-	// 	href: "/admin/settings",
-	// 	icon: Settings,
-	// },
-];
+import {
+    ROUTES,
+    MAIN_NAV_ITEMS,
+    ADMIN_ONLY_NAV_ITEMS,
+    ADMIN_NAV_ITEMS,
+} from "@/lib/constants";
 
 export function Sidebar() {
 	const pathname = usePathname();
@@ -81,7 +26,7 @@ export function Sidebar() {
 	const handleLogout = async () => {
 		await logout();
 		toast.success("Déconnexion réussie");
-		router.push("/login");
+		router.push(ROUTES.LOGIN);
 	};
 
 	return (
@@ -115,7 +60,7 @@ export function Sidebar() {
 				<nav className="flex-1 space-y-1 p-4">
 					{isAdmin && (
 						<div className="space-y-1 mb-2">
-							{adminOnlyNavItems.map((item) => (
+							{ADMIN_ONLY_NAV_ITEMS.map((item) => (
 								<Link
 									key={item.href}
 									href={item.href}
@@ -134,7 +79,7 @@ export function Sidebar() {
 					)}
 
 					<div className="space-y-1">
-						{mainNavItems.map((item) => (
+						{MAIN_NAV_ITEMS.map((item) => (
 							<Link
 								key={item.href}
 								href={item.href}
@@ -162,7 +107,7 @@ export function Sidebar() {
 								)}
 							</div>
 							<div className="space-y-1">
-								{adminNavItems.map((item) => (
+								{ADMIN_NAV_ITEMS.map((item) => (
 									<Link
 										key={item.href}
 										href={item.href}

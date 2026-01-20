@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
@@ -48,24 +50,25 @@ export function Header() {
 				</Button>
 
 				<div className="flex items-center gap-3 border-l pl-4">
-					<DropdownMenu
-						trigger={
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
 							<Avatar className="cursor-pointer transition-opacity hover:opacity-80">
 								<AvatarFallback className="bg-primary text-primary-foreground">
 									<User className="h-4 w-4" />
 								</AvatarFallback>
 							</Avatar>
-						}
-					>
-						<DropdownMenuItem onClick={() => router.push("/profile")}>
-							<User className="h-4 w-4" />
-							Profile
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={handleLogout} destructive>
-							<LogOut className="h-4 w-4" />
-							Sign out
-						</DropdownMenuItem>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={() => router.push("/profile")}>
+								<User className="h-4 w-4" />
+								Profile
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+								<LogOut className="h-4 w-4" />
+								Sign out
+							</DropdownMenuItem>
+						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
 			</div>
