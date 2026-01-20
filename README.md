@@ -258,7 +258,7 @@ Après l'exécution du script de seed :
 
 | Rôle | Email | Mot de passe |
 |------|-------|--------------|
-| **Administrateur** | `admin@example.com` | `Admin@123456` |
+| **Administrateur** | `admin@test.com` | `Admin@123456` |
 
 > **Note** : Les employés ne peuvent pas créer leur propre compte. Seul l'administrateur peut créer des comptes utilisateurs.
 
@@ -370,7 +370,6 @@ Une collection Postman est disponible dans `backend/postman/collection.json` ave
 
 ## Perspectives d'Évolution
 
-- **Token Blacklist** : Invalidation des tokens JWT à la déconnexion.
 - **Containerisation (Docker)** : Faciliter le déploiement CI/CD.
 - **Système de Notifications** : Emails de confirmation et rappels.
 - **Module Analytique** : Tableau de bord statistique.
