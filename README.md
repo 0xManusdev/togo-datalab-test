@@ -28,29 +28,29 @@
 
 ```mermaid
 flowchart TB
-    subgraph Frontend [Frontend (Next.js 16)]
+    subgraph Frontend ["Frontend (Next.js 16)"]
         direction TB
         UI[UI Components]
-        State[State Management (Zustand)]
-        Fetch[Data Fetching (TanStack Query)]
+        State["State Management (Zustand)"]
+        Fetch["Data Fetching (TanStack Query)"]
         Router[App Router]
     end
 
-    subgraph Backend [Backend (Node.js / Express)]
+    subgraph Backend ["Backend (Node.js / Express)"]
         direction TB
-        MW[Middleware (Auth, RateLimit, Helmet)]
+        MW["Middleware (Auth, RateLimit, Helmet)"]
         
-        subgraph Logic [Business Logic Layer]
-            Ctrl[Controllers (Zod Validation)]
-            Svc[Services (Algorithms & Rules)]
+        subgraph Logic ["Business Logic Layer"]
+            Ctrl["Controllers (Zod Validation)"]
+            Svc["Services (Algorithms & Rules)"]
         end
         
-        ORM[Data Access (Prisma ORM)]
+        ORM["Data Access (Prisma ORM)"]
     end
 
-    subgraph Data [Infrastructure]
-        DB[(PostgreSQL Database)]
-        Bucket[(Supabase Storage)]
+    subgraph Data ["Infrastructure"]
+        DB[("PostgreSQL Database")]
+        Bucket[("Supabase Storage")]
     end
 
     %% Relationships
