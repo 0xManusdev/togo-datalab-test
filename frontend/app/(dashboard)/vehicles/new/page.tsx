@@ -5,36 +5,48 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { useCreateVehicle } from "@/hooks/useVehicles";
-import { createVehicleSchema, CreateVehicleInput } from "@/lib/validations";
 import { ApiError } from "@/lib/api";
 import Link from "next/link";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+  brand: z.string().min(1, "La marque est requise"),
+  model: z.string().min(1, "Le modèle est requis"),
+  licensePlate: z.string().min(1, "La plaque d'immatriculation est requise"),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function NewVehiclePage() {
   const router = useRouter();
   const createVehicle = useCreateVehicle();
   const [error, setError] = useState<string | null>(null);
+  const [image, setImage] = useState<File | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CreateVehicleInput>({
-    resolver: zodResolver(createVehicleSchema),
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data: CreateVehicleInput) => {
+  const onSubmit = async (data: FormData) => {
     try {
       setError(null);
       await createVehicle.mutateAsync({
         ...data,
-        imageUrl: data.imageUrl || undefined,
+        image,
       });
+      toast.success("Véhicule ajouté avec succès");
       router.push("/vehicles");
     } catch (err) {
       if (err instanceof ApiError) {
@@ -117,17 +129,12 @@ export default function NewVehiclePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="imageUrl">URL de l'image (optionnel)</Label>
-              <Input
-                id="imageUrl"
-                placeholder="https://..."
-                {...register("imageUrl")}
+              <Label>Image du véhicule (optionnel)</Label>
+              <ImageUpload
+                value={image}
+                onChange={setImage}
+                disabled={isSubmitting}
               />
-              {errors.imageUrl && (
-                <p className="text-sm text-destructive">
-                  {errors.imageUrl.message}
-                </p>
-              )}
             </div>
 
             <div className="flex justify-end gap-4 pt-4">

@@ -11,6 +11,9 @@ export const EnvSchema = z.object({
     FRONTEND_URL: z.string().min(1, { message: 'FRONTEND_URL est requis.' }),
     JWT_SECRET: z.string().min(1, { message: 'JWT_SECRET est requis.' }),
     RATE_LIMIT_MAX_REQUESTS: z.string().regex(/^\d+$/).optional().default('100'),
+    BUCKET_NAME: z.string().min(1, { message: 'BUCKET_NAME est requis.' }),
+    SUPABASE_URL: z.string().min(1, { message: 'SUPABASE_URL est requis.' }),
+    SUPABASE_SERVICE_KEY: z.string().min(1, { message: 'SUPABASE_SERVICE_KEY est requis.' }),
 });
 
 const parsed = EnvSchema.safeParse(process.env);
@@ -27,4 +30,7 @@ export const config = {
     frontendUrl: parsed.data.FRONTEND_URL,
     jwtSecret: parsed.data.JWT_SECRET,
     rateLimitMaxRequests: parseInt(parsed.data.RATE_LIMIT_MAX_REQUESTS, 10),
+    bucketName: parsed.data.BUCKET_NAME,
+    supabaseUrl: parsed.data.SUPABASE_URL,
+    supabaseServiceKey: parsed.data.SUPABASE_SERVICE_KEY,
 }

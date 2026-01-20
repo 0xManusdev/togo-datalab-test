@@ -3,6 +3,7 @@ import { createVehicleSchema, updateVehicleSchema } from '@/dto/vehicle.schema';
 import { authenticate, authorizeAdmin } from '@/middleware/auth.middleware';
 import { validate } from '@/middleware/validate.middleware';
 import { validateUuidParam } from '@/middleware/validateUuid.middleware';
+import { vehicleImageUpload } from '@/config/multer.config';
 import { Router } from 'express';
 
 
@@ -15,8 +16,8 @@ router.get('/available', vehicleController.findAvailable);
 router.get('/:id', validateUuidParam('id'), vehicleController.findById);
 router.get('/', authorizeAdmin, vehicleController.findAll);
 
-router.post('/', authorizeAdmin, validate(createVehicleSchema), vehicleController.create);
-router.put('/:id', authorizeAdmin, validateUuidParam('id'), validate(updateVehicleSchema), vehicleController.update);
+router.post('/', authorizeAdmin, vehicleImageUpload, vehicleController.create);
+router.put('/:id', authorizeAdmin, validateUuidParam('id'), vehicleImageUpload, vehicleController.update);
 router.delete('/:id', authorizeAdmin, validateUuidParam('id'), vehicleController.delete);
 
 export default router;
