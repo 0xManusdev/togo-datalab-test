@@ -128,13 +128,7 @@ export default function DashboardPage() {
                         {bookingsLoading ? (
                             <div className="space-y-4">
                                 {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center gap-4">
-                                        <Skeleton className="h-12 w-12 rounded-lg" />
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-4 w-32" />
-                                            <Skeleton className="h-3 w-24" />
-                                        </div>
-                                    </div>
+                                    <Skeleton key={i} className="h-10 w-full" />
                                 ))}
                             </div>
                         ) : upcomingBookings.length === 0 ? (
@@ -142,32 +136,39 @@ export default function DashboardPage() {
                                 Aucune réservation à venir
                             </p>
                         ) : (
-                            <div className="space-y-4">
-                                {upcomingBookings.map((booking) => (
-                                    <div
-                                        key={booking.id}
-                                        className="flex items-center justify-between rounded-lg border p-4"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                                <Car className="h-6 w-6" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className="border-b text-left text-muted-foreground">
+                                            <th className="pb-2 font-medium">Véhicule</th>
+                                            <th className="pb-2 font-medium">Utilisateur</th>
+                                            <th className="pb-2 font-medium">Destination</th>
+                                            <th className="pb-2 font-medium">Période</th>
+                                            <th className="pb-2 font-medium">Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                        {upcomingBookings.map((booking) => (
+                                            <tr key={booking.id} className="hover:bg-muted/50">
+                                                <td className="py-3 font-medium">
                                                     {booking.vehicle.brand} {booking.vehicle.model}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {formatDate(booking.startDate)} -{" "}
-                                                    {formatDate(booking.endDate)}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    📍 {booking.destination} · {booking.user?.firstName} {booking.user?.lastName}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <Badge variant="success">Confirmée</Badge>
-                                    </div>
-                                ))}
+                                                </td>
+                                                <td className="py-3">
+                                                    {booking.user?.firstName} {booking.user?.lastName}
+                                                </td>
+                                                <td className="py-3 text-muted-foreground">
+                                                    {booking.destination || "-"}
+                                                </td>
+                                                <td className="py-3 text-muted-foreground whitespace-nowrap">
+                                                    {formatDate(booking.startDate)} - {formatDate(booking.endDate)}
+                                                </td>
+                                                <td className="py-3">
+                                                    <Badge variant="success">Confirmée</Badge>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         )}
                     </CardContent>

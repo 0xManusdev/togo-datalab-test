@@ -84,16 +84,7 @@ export default function BookingsPage() {
             {isLoading ? (
                 <div className="space-y-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <Card key={i}>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <Skeleton className="h-16 w-16 rounded-lg" />
-                                <div className="flex-1 space-y-2">
-                                    <Skeleton className="h-5 w-48" />
-                                    <Skeleton className="h-4 w-32" />
-                                </div>
-                                <Skeleton className="h-8 w-24" />
-                            </CardContent>
-                        </Card>
+                        <Skeleton key={i} className="h-12 w-full" />
                     ))}
                 </div>
             ) : filteredBookings.length === 0 ? (
@@ -108,87 +99,93 @@ export default function BookingsPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="space-y-4">
-                    {filteredBookings.map((booking) => {
-                        const isUpcoming = new Date(booking.startDate) > new Date();
-                        const canCancel =
-                            booking.status === "CONFIRMED" && isUpcoming;
+                <Card>
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b text-left text-muted-foreground">
+                                        <th className="p-4 font-medium">Véhicule</th>
+                                        {isAdmin && <th className="p-4 font-medium">Utilisateur</th>}
+                                        <th className="p-4 font-medium">Destination</th>
+                                        <th className="p-4 font-medium">Période</th>
+                                        <th className="p-4 font-medium">Statut</th>
+                                        <th className="p-4 font-medium">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                    {filteredBookings.map((booking) => {
+                                        const isUpcoming = new Date(booking.startDate) > new Date();
+                                        const canCancel = booking.status === "CONFIRMED" && isUpcoming;
 
-                        return (
-                            <Card key={booking.id}>
-                                <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
-                                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <Car className="h-8 w-8" />
-                                    </div>
-
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <h6 className="font-semibold text-sm">
-                                                {booking.vehicle.brand} {booking.vehicle.model}
-                                            </h6>
-                                            <Badge
-                                                variant={
-                                                    booking.status === "CONFIRMED"
-                                                        ? "success"
-                                                        : "secondary"
-                                                }
-                                                className="rounded-full"
-                                            >
-                                                {booking.status === "CONFIRMED"
-                                                    ? "Confirmée"
-                                                    : "Annulée"}
-                                            </Badge>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground">
-                                            {booking.vehicle.licensePlate}
-                                        </p>
-
-                                        <div className="mt-1 text-sm">
-                                            <div className="flex items-center gap-1">
-                                                <Clock className="mr-2 h-4 w-4" />
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium">
-                                                        {formatDateTime(booking.startDate)}
-                                                    </span>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        au
-                                                    </span>
-                                                    <span className="font-medium">
-                                                        {formatDateTime(booking.endDate)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {isAdmin && (
-                                            <p className="mt-1 text-xs text-muted-foreground">
-                                                Par: {booking.user.firstName} {booking.user.lastName}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        <Link href={`/bookings/${booking.id}`}>
-                                            <Button variant="outline" size="sm">
-                                                Détails
-                                            </Button>
-                                        </Link>
-                                        {canCancel && (
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleCancel(booking.id)}
-                                                disabled={cancelBooking.isPending}
-                                            >
-                                                <X className="mr-1 h-4 w-4" />
-                                                Annuler
-                                            </Button>
-                                        )}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
+                                        return (
+                                            <tr key={booking.id} className="hover:bg-muted/50">
+                                                <td className="p-4">
+                                                    <div>
+                                                        <p className="font-medium">
+                                                            {booking.vehicle.brand} {booking.vehicle.model}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {booking.vehicle.licensePlate}
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                                {isAdmin && (
+                                                    <td className="p-4">
+                                                        {booking.user.firstName} {booking.user.lastName}
+                                                    </td>
+                                                )}
+                                                <td className="p-4 text-muted-foreground">
+                                                    {booking.destination || "-"}
+                                                </td>
+                                                <td className="p-4 whitespace-nowrap">
+                                                    <div className="text-sm">
+                                                        <p>{formatDate(booking.startDate)}</p>
+                                                        <p className="text-muted-foreground">
+                                                            au {formatDate(booking.endDate)}
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4">
+                                                    <Badge
+                                                        variant={
+                                                            booking.status === "CONFIRMED"
+                                                                ? "success"
+                                                                : "secondary"
+                                                        }
+                                                    >
+                                                        {booking.status === "CONFIRMED"
+                                                            ? "Confirmée"
+                                                            : "Annulée"}
+                                                    </Badge>
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="flex gap-2">
+                                                        <Link href={`/bookings/${booking.id}`}>
+                                                            <Button variant="outline" size="sm">
+                                                                Détails
+                                                            </Button>
+                                                        </Link>
+                                                        {canCancel && (
+                                                            <Button
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                onClick={() => handleCancel(booking.id)}
+                                                                disabled={cancelBooking.isPending}
+                                                            >
+                                                                Annuler
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </CardContent>
+                </Card>
             )}
 
             {/* Pagination */}
