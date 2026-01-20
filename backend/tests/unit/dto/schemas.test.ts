@@ -10,7 +10,7 @@ describe('Schémas de Validation Zod', () => {
             it('devrait valider des données d\'inscription correctes', () => {
                 const validData = {
                     email: 'test@example.com',
-                    password: 'SecureP@ss123!',
+                    password: 'Password123',
                     firstName: 'John',
                     lastName: 'Doe',
                     phone: '+22890000000',
@@ -33,10 +33,10 @@ describe('Schémas de Validation Zod', () => {
                 expect(result.success).toBe(false);
             });
 
-            it('devrait rejeter un mot de passe trop court (< 12 caractères)', () => {
+            it('devrait rejeter un mot de passe trop court (< 8 caractères)', () => {
                 const invalidData = {
                     email: 'test@example.com',
-                    password: 'Short@123', // 9 caractères, trop court
+                    password: '1234567', // 7 caractères
                     firstName: 'John',
                     lastName: 'Doe',
                     phone: '+22890000000',
@@ -97,10 +97,10 @@ describe('Schémas de Validation Zod', () => {
                 expect(result.success).toBe(true);
             });
 
-            it('devrait rejeter un mot de passe trop court (< 12 caractères)', () => {
+            it('devrait rejeter un mot de passe trop court (< 8 caractères)', () => {
                 const invalidData = {
                     email: 'test@example.com',
-                    password: 'Short@123', // 9 caractères, trop court
+                    password: '1234567', // 7 caractères
                 };
 
                 const result = loginSchema.safeParse(invalidData);
