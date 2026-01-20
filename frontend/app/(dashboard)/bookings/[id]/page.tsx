@@ -106,6 +106,12 @@ export default function BookingDetailPage({
                                 </span>
                             </div>
                             <div className="flex justify-between">
+                                <span className="text-muted-foreground">Destination</span>
+                                <span className="font-medium">
+                                    {booking.destination}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
                                 <span className="text-muted-foreground">Créée le</span>
                                 <span className="font-medium">
                                     {formatDate(booking.createdAt)}
@@ -135,7 +141,6 @@ export default function BookingDetailPage({
                     </CardContent>
                 </Card>
 
-                {/* Vehicle Info */}
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">

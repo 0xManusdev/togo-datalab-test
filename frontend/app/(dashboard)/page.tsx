@@ -160,6 +160,9 @@ export default function DashboardPage() {
                                                     {formatDate(booking.startDate)} -{" "}
                                                     {formatDate(booking.endDate)}
                                                 </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    📍 {booking.destination} · {booking.user?.firstName} {booking.user?.lastName}
+                                                </p>
                                             </div>
                                         </div>
                                         <Badge variant="success">Confirmée</Badge>

@@ -126,6 +126,7 @@ export class BookingService {
                     userId,
                     startDate,
                     endDate,
+                    destination: data.destination,
                     reason: data.reason,
                     status: 'CONFIRMED'
                 },

@@ -9,6 +9,7 @@ export interface Booking {
     vehicleId: string;
     startDate: string;
     endDate: string;
+    destination: string;
     reason?: string;
     status: BookingStatus;
     createdAt: string;

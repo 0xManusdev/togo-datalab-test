@@ -135,7 +135,8 @@ Afin de respecter la contrainte stricte d'intégrité des données, le cœur du 
 
 ### 🔐 Authentification et Sécurité
 
-- **Inscription et Connexion** : Protocole sécurisé avec hachage fort des mots de passe (`bcryptjs`).
+- **Connexion Sécurisée** : Protocole sécurisé avec hachage fort des mots de passe (`bcryptjs`).
+- **Gestion Centralisée des Utilisateurs** : Seuls les administrateurs peuvent créer des comptes utilisateurs (pas de self-registration).
 - **Gestion de Session** : Utilisation de **Cookies HttpOnly** pour sécuriser le transport des JWT.
 - **Contrôle d'Accès (RBAC)** : Distinction stricte des droits entre les rôles `EMPLOYEE` et `ADMIN`.
 - **Protection API** : Middleware `Helmet` pour la sécurisation des en-têtes HTTP et `Rate Limiting` contre les attaques par force brute.
@@ -143,13 +144,21 @@ Afin de respecter la contrainte stricte d'intégrité des données, le cœur du 
 ### 🚙 Gestion de Flotte (Admin)
 
 - Administration complète du parc automobile (Ajout, modification, suppression).
+- **Upload d'images** : Les administrateurs peuvent uploader des images de véhicules (stockage Supabase Storage).
 - Gestion des statuts de disponibilité technique (maintenance, hors service).
 
 ### 📅 Moteur de Réservation
 
 - **Vérification de Disponibilité** : Moteur algorithmique anti-chevauchement.
 - **Interface de Recherche** : Filtrage par dates et visualisation immédiate des véhicules disponibles.
+- **Destination** : Suivi de la destination de chaque déplacement.
 - **Historique** : Suivi complet des réservations passées et à venir.
+
+### 👥 Gestion des Utilisateurs (Admin)
+
+- Liste complète des utilisateurs avec leurs rôles.
+- Création de nouveaux utilisateurs (Employé ou Administrateur).
+- Suppression des comptes utilisateurs (avec protection contre l'auto-suppression).
 
 ---
 
@@ -187,6 +196,11 @@ JWT_SECRET="votre_secret_tres_securise_minimum_32_caracteres"
 
 # Port du serveur (optionnel, défaut: 8000)
 PORT=8000
+
+# Supabase Storage (pour l'upload d'images)
+SUPABASE_URL="https://votre-projet.supabase.co"
+SUPABASE_SERVICE_KEY="votre_cle_service_role"
+BUCKET_NAME="vehicle-images"
 ```
 
 ```bash
@@ -241,7 +255,7 @@ Après avoir exécuté le script de seed (`npm run prisma:seed`), les comptes su
 |------|-------|--------------|
 | 👑 **Administrateur** | `admin@example.com` | `Admin@123456` |
 
-> **Note** : Les employés peuvent créer leur compte via la page d'inscription. L'administrateur peut ensuite gérer leurs accès depuis le tableau de bord.
+> **Note** : Les employés ne peuvent pas créer leur propre compte. Seul l'administrateur peut créer des comptes utilisateurs depuis la page `/admin/users`.
 
 ### Véhicules de Démonstration
 
@@ -296,7 +310,6 @@ hooks/              # Hooks React personnalisés
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| `POST` | `/api/auth/register` | Inscription d'un nouvel utilisateur |
 | `POST` | `/api/auth/login` | Connexion et obtention du token JWT |
 | `POST` | `/api/auth/logout` | Déconnexion (invalidation du cookie) |
 | `GET` | `/api/auth/me` | Récupérer le profil de l'utilisateur connecté |
@@ -325,8 +338,9 @@ hooks/              # Hooks React personnalisés
 
 | Méthode | Endpoint | Description | Accès |
 |---------|----------|-------------|-------|
-| `GET` | `/api/users` | Liste des utilisateurs | 👑 Admin |
-| `PUT` | `/api/users/:id` | Modifier un utilisateur | 👑 Admin |
+| `GET` | `/api/users` | Liste paginée des utilisateurs | 👑 Admin |
+| `GET` | `/api/users/:id` | Détails d'un utilisateur | 👑 Admin |
+| `POST` | `/api/users` | Créer un utilisateur (avec rôle) | 👑 Admin |
 | `DELETE` | `/api/users/:id` | Supprimer un utilisateur | 👑 Admin |
 
 ---
