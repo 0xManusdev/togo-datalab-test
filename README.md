@@ -1,7 +1,7 @@
 # Système de Gestion de Réservation de Véhicules
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-4169E1?logo=postgresql&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
@@ -186,7 +186,8 @@ Pour éviter les incohérences liées aux décalages horaires (ex: réservation 
 ### Gestion des Utilisateurs (Admin)
 
 - Liste complète des utilisateurs avec leurs rôles.
-- Création et suppression de comptes.
+- **CRUD complet** : Création, modification et suppression de comptes.
+- Attribution des rôles (Admin/Employé).
 
 ---
 
@@ -334,6 +335,7 @@ hooks/              # Hooks React personnalisés
 | `GET` | `/api/users` | Liste des utilisateurs | Admin |
 | `GET` | `/api/users/:id` | Détails d'un utilisateur | Admin |
 | `POST` | `/api/users` | Créer un utilisateur | Admin |
+| `PUT` | `/api/users/:id` | Modifier un utilisateur | Admin |
 | `DELETE` | `/api/users/:id` | Supprimer un utilisateur | Admin |
 
 ---
