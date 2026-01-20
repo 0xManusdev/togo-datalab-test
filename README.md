@@ -202,6 +202,8 @@ Pour éviter les incohérences liées aux décalages horaires (ex: réservation 
 
 ### 1. Configuration du Backend
 
+> Les variables necessaires pour le backend ont été mis en pièce jointe dans le mail de soumission du projet pour des raisons de sécurité.
+
 ```bash
 cd backend
 npm install
@@ -209,7 +211,7 @@ cp .env.example .env
 ```
 
 **Variables d'environnement requises** :
-
+> 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/vehicle_booking"
 JWT_SECRET="votre_secret_tres_securise"
