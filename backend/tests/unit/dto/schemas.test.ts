@@ -251,6 +251,16 @@ describe('Schémas de Validation Zod', () => {
                 const result = updateVehicleSchema.safeParse(validData);
                 expect(result.success).toBe(true);
             });
+
+            it('devrait accepter "true"/"false" comme string pour isAvailable (multipart fix)', () => {
+                 const resultTrue = updateVehicleSchema.safeParse({ isAvailable: 'true' });
+                 expect(resultTrue.success).toBe(true);
+                 if (resultTrue.success) expect(resultTrue.data.isAvailable).toBe(true);
+
+                 const resultFalse = updateVehicleSchema.safeParse({ isAvailable: 'false' });
+                 expect(resultFalse.success).toBe(true);
+                 if (resultFalse.success) expect(resultFalse.data.isAvailable).toBe(false);
+            });
         });
 
         describe('availableVehiclesQuerySchema', () => {

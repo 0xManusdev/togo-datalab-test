@@ -8,7 +8,11 @@ export const createVehicleSchema = z.object({
 });
 
 export const updateVehicleSchema = createVehicleSchema.partial().extend({
-    isAvailable: z.boolean().optional(),
+    isAvailable: z.preprocess((val) => {
+        if (val === 'true') return true;
+        if (val === 'false') return false;
+        return val;
+    }, z.boolean().optional()),
 });
 
 export const availableVehiclesQuerySchema = z.object({

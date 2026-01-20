@@ -6,7 +6,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-4169E1?logo=postgresql&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)
-![Tests](https://img.shields.io/badge/Tests-85%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-86%20passed-brightgreen)
 
 > **Contexte et Objectif** : Ce projet, réalisé dans le cadre du test technique de recrutement pour le **Togo Data Lab**, est une application web de gestion de réservation de véhicules dont l'objectif est de permettre aux utilisateurs de réserver des véhicules en fonction de leurs disponibilités tout en empêchant les conflits d'usage ou chevauchement de réservations, garantissant ainsi la continuité des missions.
 
@@ -360,8 +360,8 @@ npm test
 | **UploadService** | 5 tests (Upload/Delete images, mocks Supabase) |
 | **AuthService** | 7 tests (login, getUserById, messages d'erreur unifiés) |
 | **AuthMiddleware** | 7 tests (authentification, autorisation admin) |
-| **SchémasZod** | 22 tests (validation entrées) |
-| **Total** | **85 tests** |
+| **SchémasZod** | 23 tests (validation entrées + fix multipart boolean) |
+| **Total** | **86 tests** |
 
 ### Collection Postman
 
