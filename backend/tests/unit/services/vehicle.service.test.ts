@@ -88,7 +88,38 @@ describe('VehicleService', () => {
 
             const result = await vehicleService.findById('v1');
 
-            expect(result).toEqual(vehicle);
+            expect(result).toEqual({
+                ...vehicle,
+                currentlyBooked: false
+            });
+        });
+
+        it('devrait indiquer currentlyBooked=true si une réservation est en cours', async () => {
+            const now = new Date();
+            const activeBooking = {
+                id: 'b1',
+                startDate: new Date(now.getTime() - 1000000), // Started in past
+                endDate: new Date(now.getTime() + 1000000),   // Ends in future
+                status: 'CONFIRMED'
+            };
+
+            const vehicleWithBooking = {
+                id: 'v1',
+                brand: 'Toyota',
+                model: 'Corolla',
+                licensePlate: 'TG-1234-AB',
+                isAvailable: true,
+                bookings: [activeBooking],
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                imageUrl: null
+            };
+
+            mockPrisma.vehicle.findUnique.mockResolvedValue(vehicleWithBooking as any);
+
+            const result = await vehicleService.findById('v1');
+
+            expect(result.currentlyBooked).toBe(true);
         });
 
         it('devrait lever NotFoundError si le véhicule n\'existe pas', async () => {

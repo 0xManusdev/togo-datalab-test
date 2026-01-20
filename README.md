@@ -355,13 +355,13 @@ npm test
 | Suite | Tests |
 |-------|-------|
 | **BookingService** | 24 tests (création, dates, chevauchement, annulation, modification, suppression) |
-| **VehicleService** | 11 tests (CRUD, disponibilité, suppression avec réservations) |
+| **VehicleService** | 12 tests (CRUD, disponibilité, suppression avec réservations, status bookings) |
 | **UserService** | 9 tests (CRUD Admin, pagination, gestion des conflits) |
 | **UploadService** | 5 tests (Upload/Delete images, mocks Supabase) |
 | **AuthService** | 7 tests (login, getUserById, messages d'erreur unifiés) |
 | **AuthMiddleware** | 7 tests (authentification, autorisation admin) |
 | **SchémasZod** | 23 tests (validation entrées + fix multipart boolean) |
-| **Total** | **86 tests** |
+| **Total** | **87 tests** |
 
 ### Collection Postman
 

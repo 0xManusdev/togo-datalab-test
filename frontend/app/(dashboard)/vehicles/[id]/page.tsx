@@ -136,8 +136,12 @@ export default function VehicleDetailPage({
 							</div>
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">Statut</span>
-								<Badge variant={vehicle.isAvailable ? "success" : "secondary"}>
-									{vehicle.isAvailable ? "Disponible" : "Indisponible"}
+								<Badge variant={
+									vehicle.currentlyBooked ? "destructive" :
+									vehicle.isAvailable ? "success" : "secondary"
+								}>
+									{vehicle.currentlyBooked ? "Réservé" :
+									vehicle.isAvailable ? "Disponible" : "Indisponible"}
 								</Badge>
 							</div>
 						</div>

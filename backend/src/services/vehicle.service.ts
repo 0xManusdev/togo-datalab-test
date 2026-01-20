@@ -50,6 +50,7 @@ export class VehicleService {
     }
 
     async findById(id: string) {
+        const now = new Date();
         const vehicle = await prisma.vehicle.findUnique({
             where: { id },
             include: {
@@ -64,7 +65,14 @@ export class VehicleService {
             throw new NotFoundError('Véhicule non trouvé');
         }
 
-        return vehicle;
+        const activeBooking = vehicle.bookings.find(booking => 
+            booking.startDate <= now && booking.endDate >= now
+        );
+
+        return {
+            ...vehicle,
+            currentlyBooked: !!activeBooking
+        };
     }
 
     async create(data: CreateVehicleDTO) {
