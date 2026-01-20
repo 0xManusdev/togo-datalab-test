@@ -1,15 +1,18 @@
 import { AuthRequest } from '@/middleware/auth.middleware';
 import { VehicleService } from '@/services/vehicle.service';
-import { availableVehiclesQuerySchema } from '@/dto/vehicle.schema';
+import { UploadService } from '@/services/upload.service';
+import { availableVehiclesQuerySchema, createVehicleSchema, updateVehicleSchema } from '@/dto/vehicle.schema';
 import { paginationSchema } from '@/utils/pagination';
 import { Response, NextFunction } from 'express';
 
 
 export class VehicleController {
     private vehicleService: VehicleService;
+    private uploadService: UploadService;
 
     constructor() {
         this.vehicleService = new VehicleService();
+        this.uploadService = new UploadService();
     }
 
     public findAll = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -66,7 +69,25 @@ export class VehicleController {
 
     public create = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const vehicle = await this.vehicleService.create(req.body);
+            const validationResult = createVehicleSchema.safeParse(req.body);
+            if (!validationResult.success) {
+                res.status(400).json({
+                    status: 'error',
+                    message: 'Données invalides',
+                    errors: validationResult.error.flatten().fieldErrors
+                });
+                return;
+            }
+
+            let imageUrl: string | undefined;
+            if (req.file) {
+                imageUrl = await this.uploadService.uploadVehicleImage(req.file);
+            }
+
+            const vehicle = await this.vehicleService.create({
+                ...validationResult.data,
+                imageUrl,
+            });
             res.status(201).json({ status: 'success', data: vehicle });
         } catch (error) {
             next(error);
@@ -80,7 +101,30 @@ export class VehicleController {
                 res.status(400).json({ status: 'error', message: 'ID invalide' });
                 return;
             }
-            const vehicle = await this.vehicleService.update(id, req.body);
+
+            const validationResult = updateVehicleSchema.safeParse(req.body);
+            if (!validationResult.success) {
+                res.status(400).json({
+                    status: 'error',
+                    message: 'Données invalides',
+                    errors: validationResult.error.flatten().fieldErrors
+                });
+                return;
+            }
+
+            let imageUrl: string | undefined;
+            if (req.file) {
+                const existingVehicle = await this.vehicleService.findById(id);
+                if (existingVehicle.imageUrl) {
+                    await this.uploadService.deleteVehicleImage(existingVehicle.imageUrl);
+                }
+                imageUrl = await this.uploadService.uploadVehicleImage(req.file);
+            }
+
+            const vehicle = await this.vehicleService.update(id, {
+                ...validationResult.data,
+                ...(imageUrl && { imageUrl }),
+            });
             res.json({ status: 'success', data: vehicle });
         } catch (error) {
             next(error);
@@ -94,6 +138,12 @@ export class VehicleController {
                 res.status(400).json({ status: 'error', message: 'ID invalide' });
                 return;
             }
+            
+            const vehicle = await this.vehicleService.findById(id);
+            if (vehicle.imageUrl) {
+                await this.uploadService.deleteVehicleImage(vehicle.imageUrl);
+            }
+            
             await this.vehicleService.delete(id);
             res.status(204).send();
         } catch (error) {

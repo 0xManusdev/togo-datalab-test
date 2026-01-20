@@ -89,6 +89,41 @@ class ApiClient {
     async delete<T>(endpoint: string): Promise<T> {
         return this.request<T>(endpoint, { method: "DELETE" });
     }
+
+    private async requestFormData<T>(
+        endpoint: string,
+        method: string,
+        formData: FormData
+    ): Promise<T> {
+        const url = `${this.baseUrl}${endpoint}`;
+
+        const response = await fetch(url, {
+            method,
+            credentials: "include",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({
+                message: "Une erreur est survenue",
+            }));
+            throw new ApiError(error.message || "Erreur serveur", response.status, error.errors);
+        }
+
+        if (response.status === 204) {
+            return {} as T;
+        }
+
+        return response.json();
+    }
+
+    async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+        return this.requestFormData<T>(endpoint, "POST", formData);
+    }
+
+    async putFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+        return this.requestFormData<T>(endpoint, "PUT", formData);
+    }
 }
 
 export class ApiError extends Error {
