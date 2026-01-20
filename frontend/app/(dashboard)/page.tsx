@@ -68,9 +68,9 @@ export default function DashboardPage() {
                     loading={vehiclesLoading}
                 />
                 <StatsCard
-                    title="Réservations actives"
+                    title="Réservations du jour"
                     value={confirmedBookings.length}
-                    description="En cours ou à venir"
+                    description="Toutes les réservations du jour"
                     icon={CalendarCheck}
                     loading={bookingsLoading}
                 />
