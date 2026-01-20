@@ -42,13 +42,10 @@ export function Modal({
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center">
-			{/* Backdrop */}
 			<div
 				className="absolute inset-0 bg-black/50 backdrop-blur-sm"
 				onClick={onClose}
 			/>
-
-			{/* Modal Content */}
 			<div
 				className={cn(
 					"relative z-10 w-full max-w-lg rounded-xl bg-background p-6 shadow-lg",
@@ -56,7 +53,6 @@ export function Modal({
 					className
 				)}
 			>
-				{/* Close Button */}
 				<Button
 					variant="ghost"
 					size="icon"
@@ -66,7 +62,6 @@ export function Modal({
 					<X className="h-4 w-4" />
 				</Button>
 
-				{/* Header */}
 				{(title || description) && (
 					<div className="mb-6">
 						{title && (
@@ -80,7 +75,6 @@ export function Modal({
 					</div>
 				)}
 
-				{/* Body */}
 				{children}
 			</div>
 		</div>

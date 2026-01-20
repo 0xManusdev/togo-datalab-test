@@ -1,10 +1,6 @@
 import { toast } from "sonner";
 import { ApiError } from "./api";
 
-/**
- * Centralized error handler for API and application errors.
- * Displays appropriate toast notifications based on error type.
- */
 export function handleError(error: unknown, context?: string): void {
     let message: string;
     let description: string | undefined;
@@ -38,9 +34,6 @@ export function handleError(error: unknown, context?: string): void {
     toast.error(message, { description });
 }
 
-/**
- * Wrapper for async operations with automatic error handling.
- */
 export async function withErrorHandling<T>(
     operation: () => Promise<T>,
     context?: string

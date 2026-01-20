@@ -35,7 +35,6 @@ export function DateTimePicker({
 }: DateTimePickerProps) {
 	const [timeValue, setTimeValue] = React.useState<string>("09:00")
 
-	// Sync timeValue when date prop changes
 	React.useEffect(() => {
 		if (date) {
 			setTimeValue(format(date, "HH:mm"))
@@ -57,13 +56,11 @@ export function DateTimePicker({
 		const newTime = e.target.value
 		setTimeValue(newTime)
 		
-		// Only update the date if we have a valid time format
 		if (date && newTime && newTime.includes(":")) {
 			const [hoursStr, minutesStr] = newTime.split(":")
 			const hours = parseInt(hoursStr, 10)
 			const minutes = parseInt(minutesStr, 10)
 			
-			// Only update if both values are valid numbers
 			if (!isNaN(hours) && !isNaN(minutes) && hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
 				const newDate = new Date(date)
 				newDate.setHours(hours, minutes, 0, 0)
@@ -72,7 +69,6 @@ export function DateTimePicker({
 		}
 	}
 
-	// Create a stable reference for the disabled check
 	const getMinDateForComparison = React.useCallback(() => {
 		if (minDate) {
 			const min = new Date(minDate)
