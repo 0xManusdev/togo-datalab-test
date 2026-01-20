@@ -8,8 +8,6 @@ import { AppError, UnauthorizedError } from '@/errors/AppError';
 
 export class AuthService {
 
-    // Methods register and registerAdmin removed as per audit cleanup (dead code)
-
     async login(data: LoginDTO) {
         const { email, password } = data;
 
