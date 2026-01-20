@@ -217,7 +217,7 @@ DATABASE_URL="postgresql://user:password@localhost:5432/vehicle_booking"
 JWT_SECRET="votre_secret_tres_securise"
 PORT=8000
 SUPABASE_URL="votre_url_supabase"
-SUPABASE_SERVICE_KEY="votre_cle_service_supabase"
+SUPABASE_SERVICE_KEY="cle_service_supabase"
 BUCKET_NAME="vehicle-images"
 ```
 
