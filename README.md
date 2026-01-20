@@ -260,7 +260,7 @@ Après l'exécution du script de seed :
 
 | Rôle | Email | Mot de passe |
 |------|-------|--------------|
-| **Administrateur** | `admin@test.com` | `Admin@123456` |
+| **Administrateur** | `admin@test.com` | `admin@123456` |
 
 > **Note** : Les employés ne peuvent pas créer leur propre compte. Seul l'administrateur peut créer des comptes utilisateurs.
 
