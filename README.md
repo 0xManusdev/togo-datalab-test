@@ -1,7 +1,7 @@
 # Système de Gestion de Réservation de Véhicules
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-4169E1?logo=postgresql&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
@@ -112,13 +112,14 @@ Développé avec **Next.js 16** (App Router), le frontend offre une interface r�
 
 | Technologie | Usage | Justification |
 | :--- | :--- | :--- |
-| **Next.js 16** | Framework React | Performance (SSR/SSG), Routing puissant, expérience développeur moderne. |
-| **TypeScript** | Langage | Typage statique pour réduire les bugs et améliorer la robustesse du code. |
-| **Tailwind CSS 4** | Styling | Développement rapide, maintenable et approche "Utility-first". |
-| **Shadcn/ui** | Kit UI | Composants accessibles, personnalisables et professionnels. |
-| **Zustand** | State Management | Gestion d'état global légère et performante. |
-| **TanStack Query** | Data Fetching | Gestion du cache serveur, revalidation et états de chargement. |
-| **React Hook Form** | Gestion de Formulaires | Performance et validation simplifiée côté client. |
+| **Next.js 16.1** | Framework React | Performance (SSR/SSG/RSC), Routing app router. |
+| **TypeScript 5** | Langage | Typage strict pour la robustesse du code. |
+| **Tailwind CSS 4** | Styling | Moteur de styles haute performance et utility-first. |
+| **Shadcn/ui** | Kit UI | Composants accessibles et personnalisables (basé sur Radix UI). |
+| **Zustand** | State Management | Gestion d'état global légère. |
+| **TanStack Query v5** | Data Fetching | Gestion du cache serveur, loading states et mutations. |
+| **React Hook Form** | Formulaires | Gestion performante des formulaires. |
+| **Zod** | Validation | Schémas de validation partagés avec le backend. |
 
 ### Backend (API)
 
@@ -213,8 +214,8 @@ cp .env.example .env
 DATABASE_URL="postgresql://user:password@localhost:5432/vehicle_booking"
 JWT_SECRET="votre_secret_tres_securise"
 PORT=8000
-SUPABASE_URL="lien supabase"
-SUPABASE_SERVICE_KEY="clé_service_role"
+SUPABASE_URL="votre_url_supabase"
+SUPABASE_SERVICE_KEY="votre_cle_service_supabase"
 BUCKET_NAME="vehicle-images"
 ```
 
