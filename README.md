@@ -8,44 +8,64 @@
 
 > **Contexte et Objectif** : Ce projet, réalisé dans le cadre du test technique de recrutement pour le **Togo Data Lab**, est une application web de gestion de réservation de véhicules dont l'objectif est de permettre aux utilisateurs de réserver des véhicules en fonction de leurs disponibilités tout en empêchant les conflits d'usage ou chevauchement de réservations, garantissant ainsi la continuité des missions.
 
-
-
 ---
 
-## 📋 Table des Matières
+## Table des Matières
 
-- [Démarrage Rapide](#-démarrage-rapide)
-- [Architecture et Choix Techniques](#-architecture-et-choix-techniques)
-- [Choix Fonctionnels et Algorithmiques](#-choix-fonctionnels-et-algorithmiques)
-- [Fonctionnalités Principales](#-fonctionnalités-principales)
-- [Installation et Lancement](#-installation-et-lancement)
-- [Comptes de Démonstration](#-comptes-de-démonstration)
-- [Structure du Code](#-structure-du-code)
-- [Endpoints API](#-endpoints-api)
-- [Perspectives d'Évolution](#-perspectives-dévolution)
+- [Démarrage Rapide](#démarrage-rapide)
+- [Architecture et Choix Techniques](#architecture-et-choix-techniques)
+- [Choix Fonctionnels et Algorithmiques](#choix-fonctionnels-et-algorithmiques)
+- [Fonctionnalités Principales](#fonctionnalités-principales)
+- [Installation et Lancement](#installation-et-lancement)
+- [Comptes de Démonstration](#comptes-de-démonstration)
+- [Structure du Code](#structure-du-code)
+- [Endpoints API](#endpoints-api)
+- [Perspectives d'Évolution](#perspectives-dévolution)
 
 ---
 
 ### Schéma d'Architecture
 
 ```mermaid
-flowchart LR
-    subgraph Client
-        A[🖥️ Next.js Frontend]
+flowchart TB
+    subgraph Frontend [Frontend (Next.js 16)]
+        direction TB
+        UI[UI Components]
+        State[State Management (Zustand)]
+        Fetch[Data Fetching (TanStack Query)]
+        Router[App Router]
     end
-    
-    subgraph Serveur
-        B[⚙️ Express API]
-        C[🔐 JWT Auth]
+
+    subgraph Backend [Backend (Node.js / Express)]
+        direction TB
+        MW[Middleware (Auth, RateLimit, Helmet)]
+        
+        subgraph Logic [Business Logic Layer]
+            Ctrl[Controllers (Zod Validation)]
+            Svc[Services (Algorithms & Rules)]
+        end
+        
+        ORM[Data Access (Prisma ORM)]
     end
-    
-    subgraph Données
-        D[(🗄️ PostgreSQL)]
+
+    subgraph Data [Infrastructure]
+        DB[(PostgreSQL Database)]
+        Bucket[(Supabase Storage)]
     end
+
+    %% Relationships
+    UI --> State
+    UI --> Fetch
+    Router --> Fetch
     
-    A <-->|REST API| B
-    B <--> C
-    B <-->|Prisma ORM| D
+    Fetch == "REST API (HTTPS/JSON)" ==> MW
+    
+    MW --> Ctrl
+    Ctrl --> Svc
+    Svc --> ORM
+    
+    ORM == "SQL Queries" ==> DB
+    Svc -. "Image Upload" .-> Bucket
 ```
 
 ---
@@ -76,17 +96,17 @@ npm run dev
 # Accéder à l'application : http://localhost:3000
 ```
 
-> **Astuce** : La commande `npm run dev` à la racine lance les deux serveurs en parallèle avec des logs colorés (bleu pour le backend, magenta pour le frontend).
+> **Astuce** : La commande `npm run dev` à la racine lance les deux serveurs en parallèle avec des logs colorés.
 
 ---
 
-## 🏗️ Architecture et Choix Techniques
+## Architecture et Choix Techniques
 
 Le projet adopte une **architecture N-tiers** modulaire, assurant une séparation claire des responsabilités, une maintenabilité accrue et une facilité d'évolution.
 
 ### Frontend (Client)
 
-Développé avec **Next.js 16** un framework React moderne, le frontend tire parti du **App Router** pour une gestion optimisée des routes et du rendu. L'interface a été pensée pour être épurée et réactive, minimisant le temps de prise en main par les agents.
+Développé avec **Next.js 16** (App Router), le frontend offre une interface réactive et moderne.
 
 | Technologie | Usage | Justification |
 | :--- | :--- | :--- |
@@ -113,58 +133,61 @@ L'API REST est construite avec **Node.js** et **Express**, structurée en couche
 
 ---
 
-## 🧠 Choix Fonctionnels et Algorithmiques
+## Choix Fonctionnels et Algorithmiques
 
 ### 1. Modèle de Réservation : "Instant Booking"
 
 Pour ce prototype, le choix s'est porté sur un système de **réservation directe** plutôt qu'un workflow de validation a posteriori.
 
-- **Justification** : Ce modèle fluidifie l'expérience utilisateur pour les employés et réduit la charge administrative de validation, répondant au besoin de réactivité des missions.
-- **Évolutivité** : La structure de la base de données intègre néanmoins un champ de statut (`PENDING`, `CONFIRMED`, `CANCELLED`), permettant d'activer un workflow de validation hiérarchique sans refonte majeure si les processus internes l'exigent ultérieurement.
+- **Justification** : Ce modèle fluidifie l'expérience utilisateur pour les employés et réduit la charge administrative, répondant au besoin de réactivité des missions.
+- **Évolutivité** : La structure de la base de données intègre un champ de statut (`PENDING`, `CONFIRMED`, `CANCELLED`), permettant d'activer un workflow de validation sans refonte majeure.
 
 ### 2. Gestion Critique des Conflits (Algorithme)
 
-Afin de respecter la contrainte stricte d'intégrité des données, le cœur du système repose sur un algorithme de vérification temporelle robuste implémenté dans la couche Service.
+Afin de respecter la contrainte stricte d'intégrité des données, le cœur du système repose sur un algorithme de vérification temporelle robuste.
 
-- **Logique Mathématique** : Vérification des intersections d'intervalles basée sur la logique : `(StartA < EndB) ET (EndA > StartB)`.
-- **Sécurité de Concurrence** : Implémentation de **transactions SGBD** couplées à un verrouillage optimiste lors de la création d'une réservation. Cela garantit mathématiquement qu'il est impossible que deux utilisateurs réservent le même véhicule sur le même créneau simultanément (prévention des *Race Conditions*).
+- **Logique** : Vérification des intersections d'intervalles basée sur la logique `(StartA < EndB) ET (EndA > StartB)`.
+- **Sécurité de Concurrence** : Implémentation de **transactions SGBD** pour garantir qu'il est impossible que deux utilisateurs réservent le même véhicule sur le même créneau simultanément.
+
+### 3. Harmonisation des Fuseaux Horaires (UTC)
+
+Pour éviter les incohérences liées aux décalages horaires (ex: réservation commençant à 00:00 mais enregistrée à 23:00 la veille), l'application applique une politique **UTC Stricte** :
+- Le Frontend convertit toutes les sélections locales en UTC avant l'envoi.
+- Le Backend stocke et traite exclusivement des dates UTC.
+- L'affichage est reconverti dans le fuseau horaire de l'utilisateur final.
 
 ---
 
-## ✨ Fonctionnalités Principales
+## Fonctionnalités Principales
 
-### 🔐 Authentification et Sécurité
+### Authentification et Sécurité
 
 - **Connexion Sécurisée** : Protocole sécurisé avec hachage fort des mots de passe (`bcryptjs`).
-- **Gestion Centralisée des Utilisateurs** : Seuls les administrateurs peuvent créer des comptes utilisateurs (pas de self-registration).
-- **Gestion de Session** : Utilisation de **Cookies HttpOnly** pour sécuriser le transport des JWT.
+- **Gestion Centralisée des Utilisateurs** : Création de comptes réservée aux administrateurs.
+- **Gestion de Session** : Utilisation de **Cookies HttpOnly**.
 - **Contrôle d'Accès (RBAC)** : Distinction stricte des droits entre les rôles `EMPLOYEE` et `ADMIN`.
-- **Protection API** : Middleware `Helmet` pour la sécurisation des en-têtes HTTP et `Rate Limiting` contre les attaques par force brute.
+- **Protection API** : Middleware `Helmet` et `Rate Limiting`.
 
-### 🚙 Gestion de Flotte (Admin)
+### Gestion de Flotte (Admin)
 
 - Administration complète du parc automobile (Ajout, modification, suppression).
-- **Upload d'images** : Les administrateurs peuvent uploader des images de véhicules (stockage Supabase Storage).
-- Gestion des statuts de disponibilité technique (maintenance, hors service).
+- **Upload d'images** : Stockage via Supabase Storage.
 
-### 📅 Moteur de Réservation
+### Moteur de Réservation
 
 - **Vérification de Disponibilité** : Moteur algorithmique anti-chevauchement.
-- **Interface de Recherche** : Filtrage par dates et visualisation immédiate des véhicules disponibles.
-- **Destination** : Suivi de la destination de chaque déplacement.
-- **Historique** : Suivi complet des réservations passées et à venir.
+- **Interface de Recherche** : Filtrage par dates et visualisation des véhicules disponibles.
+- **Modification/Annulation** : Les utilisateurs peuvent modifier ou annuler leurs réservations futures.
+- **Historique** : Suivi complet des réservations.
 
-### 👥 Gestion des Utilisateurs (Admin)
+### Gestion des Utilisateurs (Admin)
 
 - Liste complète des utilisateurs avec leurs rôles.
-- Création de nouveaux utilisateurs (Employé ou Administrateur).
-- Suppression des comptes utilisateurs (avec protection contre l'auto-suppression).
+- Création et suppression de comptes.
 
 ---
 
-## 🛠️ Installation et Lancement
-
-Pour installer et exécuter le projet localement, suivez ces instructions détaillées.
+## Installation et Lancement
 
 ### Prérequis
 
@@ -176,41 +199,24 @@ Pour installer et exécuter le projet localement, suivez ces instructions détai
 
 ```bash
 cd backend
-
-# Installation des dépendances
 npm install
-
-# Configuration des variables d'environnement
-# Copiez le fichier .env.example vers .env et remplissez les valeurs
 cp .env.example .env
 ```
 
 **Variables d'environnement requises** :
 
 ```env
-# Base de données PostgreSQL
 DATABASE_URL="postgresql://user:password@localhost:5432/vehicle_booking"
-
-# Secret JWT (générez une clé sécurisée)
-JWT_SECRET="votre_secret_tres_securise_minimum_32_caracteres"
-
-# Port du serveur (optionnel, défaut: 8000)
+JWT_SECRET="votre_secret_tres_securise"
 PORT=8000
-
-# Supabase Storage (pour l'upload d'images)
 SUPABASE_URL="https://votre-projet.supabase.co"
 SUPABASE_SERVICE_KEY="votre_cle_service_role"
 BUCKET_NAME="vehicle-images"
 ```
 
 ```bash
-# Synchronisation du schéma avec la base de données
 npm run prisma:push
-
-# (Optionnel) Peuplement de la base avec des données de test
 npm run prisma:seed
-
-# Lancement du serveur de développement
 npm run dev
 ```
 
@@ -218,23 +224,17 @@ npm run dev
 
 ```bash
 cd frontend
-
-# Installation des dépendances
 npm install
-
-# Configuration des variables d'environnement
 cp .env.example .env
 ```
 
 **Variables d'environnement requises** :
 
 ```env
-# URL de l'API Backend
 NEXT_PUBLIC_API_URL=http://localhost:8000/api
 ```
 
 ```bash
-# Lancement du serveur de développement
 npm run dev
 ```
 
@@ -247,110 +247,96 @@ npm run dev
 
 ---
 
-## 👤 Comptes de Démonstration
+## Comptes de Démonstration
 
-Après avoir exécuté le script de seed (`npm run prisma:seed`), les comptes suivants sont disponibles :
+Après l'exécution du script de seed :
 
 | Rôle | Email | Mot de passe |
 |------|-------|--------------|
-| 👑 **Administrateur** | `admin@example.com` | `Admin@123456` |
+| **Administrateur** | `admin@example.com` | `Admin@123456` |
 
-> **Note** : Les employés ne peuvent pas créer leur propre compte. Seul l'administrateur peut créer des comptes utilisateurs depuis la page `/admin/users`.
-
-### Véhicules de Démonstration
-
-Le seed crée également 3 véhicules de test :
-
-| Marque | Modèle | Immatriculation |
-|--------|--------|-----------------|
-| Toyota | Corolla 2023 | TG-1234-AB |
-| Honda | Civic 2022 | TG-5678-CD |
-| Hyundai | Tucson 2023 | TG-9012-EF |
+> **Note** : Les employés ne peuvent pas créer leur propre compte. Seul l'administrateur peut créer des comptes utilisateurs.
 
 ---
 
-## 📁 Structure du Code
-
-Une structure claire a été adoptée pour faciliter la navigation et la maintenance.
+## Structure du Code
 
 ### Backend (`/backend`)
 
 ```
 src/
-├── config/         # Configuration globale (Env, Logger, DB)
-├── controllers/    # Points d'entrée des requêtes, validation des inputs
-├── services/       # Logique métier pure (Algorithmes, Règles de gestion)
-├── middleware/     # Auth, Gestion d'erreurs, Logging
+├── config/         # Configuration globale
+├── controllers/    # Points d'entrée des requêtes
+├── services/       # Logique métier pure
+├── middleware/     # Auth, Gestion d'erreurs
 ├── routes/         # Définitions des endpoints API
 ├── dto/            # Data Transfer Objects (Schémas Zod)
-└── utils/          # Fonctions utilitaires partagées
+└── utils/          # Fonctions utilitaires
 ```
 
 ### Frontend (`/frontend`)
 
 ```
 app/
-├── (auth)/         # Routes d'authentification (Login/Register)
-├── (dashboard)/    # Routes protégées (Tableau de bord, Réservations)
-├── layout.tsx      # Layout racine de l'application
+├── (auth)/         # Routes d'authentification
+├── (dashboard)/    # Routes protégées
+├── layout.tsx      # Layout racine
 └── globals.css     # Styles globaux
 components/
-├── ui/             # Composants réutilisables (Design System)
-└── ...             # Composants fonctionnels spécifiques
-lib/                # Configuration des librairies (Axios, Utils)
-stores/             # Stores Zustand (État global)
+├── ui/             # Composants réutilisables
+└── ...             # Composants fonctionnels
+lib/                # Configuration (Axios, Utils)
+stores/             # Stores Zustand
 hooks/              # Hooks React personnalisés
 ```
 
 ---
 
-## 🔌 Endpoints API
+## Endpoints API
 
 ### Authentification
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| `POST` | `/api/auth/login` | Connexion et obtention du token JWT |
-| `POST` | `/api/auth/logout` | Déconnexion (invalidation du cookie) |
-| `GET` | `/api/auth/me` | Récupérer le profil de l'utilisateur connecté |
+| `POST` | `/api/auth/login` | Connexion |
+| `POST` | `/api/auth/logout` | Déconnexion |
+| `GET` | `/api/auth/me` | Profil utilisateur |
 
 ### Véhicules
 
 | Méthode | Endpoint | Description | Accès |
 |---------|----------|-------------|-------|
-| `GET` | `/api/vehicles` | Liste tous les véhicules | 🔓 Authentifié |
-| `GET` | `/api/vehicles/available` | Véhicules disponibles sur une période | 🔓 Authentifié |
-| `POST` | `/api/vehicles` | Ajouter un nouveau véhicule | 👑 Admin |
-| `PUT` | `/api/vehicles/:id` | Modifier un véhicule | 👑 Admin |
-| `DELETE` | `/api/vehicles/:id` | Supprimer un véhicule | 👑 Admin |
+| `GET` | `/api/vehicles` | Liste des véhicules | Authentifié |
+| `GET` | `/api/vehicles/available` | Véhicules disponibles | Authentifié |
+| `POST` | `/api/vehicles` | Ajouter un véhicule | Admin |
+| `PUT` | `/api/vehicles/:id` | Modifier un véhicule | Admin |
+| `DELETE` | `/api/vehicles/:id` | Supprimer un véhicule | Admin |
 
 ### Réservations
 
 | Méthode | Endpoint | Description | Accès |
 |---------|----------|-------------|-------|
-| `GET` | `/api/bookings` | Liste des réservations | 🔓 Authentifié |
-| `GET` | `/api/bookings/my` | Mes réservations | 🔓 Authentifié |
-| `POST` | `/api/bookings` | Créer une réservation | 🔓 Authentifié |
-| `PUT` | `/api/bookings/:id` | Modifier une réservation | 🔓 Propriétaire |
-| `DELETE` | `/api/bookings/:id` | Annuler une réservation | 🔓 Propriétaire |
+| `GET` | `/api/bookings` | Liste des réservations | Authentifié |
+| `GET` | `/api/bookings/my` | Mes réservations | Authentifié |
+| `POST` | `/api/bookings` | Créer une réservation | Authentifié |
+| `PATCH` | `/api/bookings/:id` | Modifier une réservation | Propriétaire |
+| `PATCH` | `/api/bookings/:id/cancel` | Annuler une réservation | Propriétaire |
 
 ### Utilisateurs (Admin)
 
 | Méthode | Endpoint | Description | Accès |
 |---------|----------|-------------|-------|
-| `GET` | `/api/users` | Liste paginée des utilisateurs | 👑 Admin |
-| `GET` | `/api/users/:id` | Détails d'un utilisateur | 👑 Admin |
-| `POST` | `/api/users` | Créer un utilisateur (avec rôle) | 👑 Admin |
-| `DELETE` | `/api/users/:id` | Supprimer un utilisateur | 👑 Admin |
+| `GET` | `/api/users` | Liste des utilisateurs | Admin |
+| `GET` | `/api/users/:id` | Détails d'un utilisateur | Admin |
+| `POST` | `/api/users` | Créer un utilisateur | Admin |
+| `DELETE` | `/api/users/:id` | Supprimer un utilisateur | Admin |
 
 ---
 
-## 🚀 Perspectives d'Évolution
+## Perspectives d'Évolution
 
-Pour une mise en production à l'échelle institutionnelle, les axes d'amélioration suivants sont identifiés :
-
-- **Containerisation (Docker)** : Mise en place de Docker et Docker Compose pour faciliter le déploiement CI/CD sur les infrastructures de l'entreprise.
-- **Système de Notifications** : Intégration d'un service d'envoi d'emails (SMTP/SendGrid) pour les confirmations de réservation et les rappels.
-- **Module Analytique** : Développement d'un tableau de bord statistique pour suivre le taux d'utilisation des véhicules et optimiser la taille du parc.
-- **Application Mobile** : Développement d'une application React Native pour permettre les réservations en mobilité.
-- **Intégration Calendrier** : Synchronisation avec Google Calendar ou Outlook pour une meilleure visibilité des réservations.
+- **Containerisation (Docker)** : Faciliter le déploiement CI/CD.
+- **Système de Notifications** : Emails de confirmation et rappels.
+- **Module Analytique** : Tableau de bord statistique.
+- **Application Mobile** : React Native.
+- **Intégration Calendrier** : Synchronisation externe.
