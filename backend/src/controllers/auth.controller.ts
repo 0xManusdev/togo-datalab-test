@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthService } from "../services/auth.service";
+import { AuthService } from "@/services/auth.service";
 import { COOKIE_OPTIONS } from "@/utils/cookie.config";
 import { AppError } from "@/errors/AppError";
 import { AuthRequest } from "@/middleware/auth.middleware";

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Users, Shield, Plus, Trash2, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,55 +113,59 @@ export default function AdminUsersPage() {
 							className="py-12"
 						/>
 					) : (
-						<div className="rounded-lg border">
-							<div className="border-b px-4 py-3">
-								<div className="grid grid-cols-5 text-sm font-medium text-muted-foreground">
-									<span>Nom</span>
-									<span>Email</span>
-									<span>Téléphone</span>
-									<span>Rôle</span>
-									<span>Actions</span>
-								</div>
-							</div>
-							<div className="divide-y">
-								{users.map((user) => (
-									<div
-										key={user.id}
-										className="grid grid-cols-5 items-center px-4 py-3"
-									>
-										<span className="font-medium">
-											{user.firstName} {user.lastName}
-										</span>
-										<span className="text-sm text-muted-foreground">
-											{user.email}
-										</span>
-										<span className="text-sm text-muted-foreground">
-											{user.phone || "-"}
-										</span>
-										<span className="text-sm text-muted-foreground">
-											{user.role === "ADMIN" ? "Admin" : "Employé"}
-										</span>
-										<div>
-											{user.id !== currentUser?.id && (
-												<Button
-													variant="ghost"
-													size="icon"
-													className="text-destructive hover:text-destructive"
-													onClick={() => openDeleteModal(user.id)}
-												>
-													<Trash2 className="h-4 w-4" />
-												</Button>
-											)}
-										</div>
-									</div>
-								))}
-							</div>
+
+						<div className="rounded-lg border overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <div className="min-w-[800px]">
+                                    <div className="border-b px-4 py-3 bg-muted/50">
+                                        <div className="grid grid-cols-5 text-xs font-medium text-muted-foreground">
+                                            <span>Nom</span>
+                                            <span>Email</span>
+                                            <span>Téléphone</span>
+                                            <span>Rôle</span>
+                                            <span>Actions</span>
+                                        </div>
+                                    </div>
+                                    <div className="divide-y">
+                                        {users.map((user) => (
+                                            <div
+                                                key={user.id}
+                                                className="grid grid-cols-5 items-center px-4 py-3 hover:bg-muted/50 transition-colors"
+                                            >
+                                                <span className="font-medium text-xs truncate pr-2">
+                                                    {user.firstName} {user.lastName}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground truncate pr-2">
+                                                    {user.email}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground truncate pr-2">
+                                                    {user.phone || "-"}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {user.role === "ADMIN" ? "Admin" : "Employé"}
+                                                </span>
+                                                <div>
+                                                    {user.id !== currentUser?.id && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-destructive hover:text-destructive h-8 w-8"
+                                                            onClick={() => openDeleteModal(user.id)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
 						</div>
 					)}
 				</CardContent>
 			</Card>
 
-			{/* Create User Modal */}
 			<Modal
 				isOpen={showCreateModal}
 				onClose={() => setShowCreateModal(false)}
@@ -269,7 +272,6 @@ export default function AdminUsersPage() {
 				</form>
 			</Modal>
 
-			{/* Delete Confirmation Modal */}
 			<ConfirmDialog
 				isOpen={showDeleteModal}
 				onClose={() => {

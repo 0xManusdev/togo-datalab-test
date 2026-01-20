@@ -13,8 +13,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { useBookings, useCancelBooking } from "@/hooks/useBookings";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDate } from "@/lib/utils";
-import { handleError } from "@/lib/error-handler";
+import { formatDateTime } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { BookingStatus } from "@/types";
 import { SortableHeader } from "@/components/ui/sortable-header";
@@ -32,13 +31,11 @@ export default function BookingsPage() {
     const bookings = data?.data || [];
     const pagination = data?.pagination;
 
-    // Filter
     const filteredBookings =
         statusFilter === "ALL"
             ? bookings
             : bookings.filter((b) => b.status === statusFilter);
 
-    // Sort
     const sortedBookings = [...filteredBookings].sort((a, b) => {
         if (!sortConfig) return 0;
 
@@ -46,7 +43,6 @@ export default function BookingsPage() {
         let aValue: any = a;
         let bValue: any = b;
 
-        // Handle nested properties (e.g. vehicle.brand)
         const keys = key.split(".");
         for (const k of keys) {
             aValue = aValue?.[k];
@@ -82,30 +78,6 @@ export default function BookingsPage() {
                 }
             />
 
-            <div className="flex gap-2">
-                <Button
-                    variant={statusFilter === "ALL" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter("ALL")}
-                >
-                    Toutes
-                </Button>
-                <Button
-                    variant={statusFilter === "CONFIRMED" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter("CONFIRMED")}
-                >
-                    Confirmées
-                </Button>
-                <Button
-                    variant={statusFilter === "CANCELLED" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter("CANCELLED")}
-                >
-                    Annulées
-                </Button>
-            </div>
-
             {isLoading ? (
                 <TableSkeleton rows={4} />
             ) : sortedBookings.length === 0 ? (
@@ -123,7 +95,7 @@ export default function BookingsPage() {
                 <Card>
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full text-xs">
                                 <thead>
                                     <tr className="border-b text-left text-muted-foreground">
                                         <th className="p-4 font-medium">
@@ -198,15 +170,16 @@ export default function BookingsPage() {
                                                 {booking.destination || "-"}
                                             </td>
                                             <td className="p-4 whitespace-nowrap">
-                                                <div className="text-sm">
-                                                    <p>{formatDate(booking.startDate)}</p>
+                                                <div className="text-xs">
+                                                    <p>{formatDateTime(booking.startDate)}</p>
                                                     <p className="text-muted-foreground">
-                                                        au {formatDate(booking.endDate)}
+                                                        au {formatDateTime(booking.endDate)}
                                                     </p>
                                                 </div>
                                             </td>
                                             <td className="p-4">
                                                 <Badge
+                                                    className="text-[10px] font-light"
                                                     variant={
                                                         booking.status === "CONFIRMED"
                                                             ? "success"

@@ -120,6 +120,8 @@ describe('Schémas de Validation Zod', () => {
                     vehicleId: '550e8400-e29b-41d4-a716-446655440000',
                     startDate: futureStart,
                     endDate: futureEnd,
+                    reason: 'Déplacement professionnel',
+                    destination: 'Lomé',
                 };
 
                 const result = createBookingSchema.safeParse(validData);

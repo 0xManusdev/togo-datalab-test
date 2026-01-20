@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { Loader } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
 
+import { MobileSidebar } from "@/components/layout/MobileSidebar";
+
 export default function DashboardLayout({
     children,
 }: {
@@ -40,14 +42,15 @@ export default function DashboardLayout({
     return (
         <div className="min-h-screen bg-muted/30">
             <Sidebar />
+            <MobileSidebar />
             <div
                 className={cn(
-                    "transition-all duration-300",
-                    sidebarCollapsed ? "ml-[72px]" : "ml-[280px]"
+                    "transition-all duration-300 ml-0",
+                    sidebarCollapsed ? "md:ml-[72px]" : "md:ml-[280px]"
                 )}
             >
                 <Header />
-                <main className="p-8 rounded-tl-3xl min-h-screen border-2 border-muted border-b-0">{children}</main>
+                <main className="p-4 md:p-8 rounded-tl-3xl min-h-screen border-2 border-muted border-b-0">{children}</main>
             </div>
         </div>
     );

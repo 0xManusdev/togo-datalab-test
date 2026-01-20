@@ -124,10 +124,10 @@ L'API REST est construite avec **Node.js** et **Express**, structurée en couche
 
 | Technologie | Usage | Justification |
 | :--- | :--- | :--- |
-| **Express.js** | Framework Web | Standard de l'industrie, robuste et flexible. |
-| **Prisma ORM** | Accès Données | Sécurité du typage, migrations simplifiées et protection contre les injections SQL. |
+| **Express.js** | Framework Web | Standard de l'industrie du web, robuste et flexible. |
+| **Prisma ORM** | Accès Données | Sécurité du typage, migrations simplifiées et la protection contre les injections SQL. |
 | **PostgreSQL** | Base de Données | Fiabilité ACID, performance et gestion des contraintes relationnelles complexes. |
-| **Zod** | Validation | Validation rigoureuse des entrées (Runtime type checking) avant traitement. |
+| **Zod** | Validation | Validation rigoureuse des entrées (Runtime type checking) avant tout traitement. |
 | **JWT (HttpOnly)** | Authentification | Sécurité accrue contre les failles XSS par rapport au stockage local. |
 | **Winston / Morgan** | Logging | Traçabilité des erreurs et débogage en production. |
 
@@ -321,6 +321,7 @@ hooks/              # Hooks React personnalisés
 | `POST` | `/api/bookings` | Créer une réservation | Authentifié |
 | `PATCH` | `/api/bookings/:id` | Modifier une réservation | Propriétaire |
 | `PATCH` | `/api/bookings/:id/cancel` | Annuler une réservation | Propriétaire |
+| `DELETE` | `/api/bookings/:id` | Supprimer une réservation | Admin |
 
 ### Utilisateurs (Admin)
 

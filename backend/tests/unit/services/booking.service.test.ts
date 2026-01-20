@@ -13,7 +13,7 @@ describe('BookingService', () => {
     describe('Validation des dates', () => {
         it('devrait rejeter une réservation avec date de fin avant date de début', async () => {
             const startDate = new Date('2026-01-20T10:00:00Z');
-            const endDate = new Date('2026-01-18T10:00:00Z'); // Avant startDate
+            const endDate = new Date('2026-01-18T10:00:00Z'); 
 
             mockPrisma.$transaction.mockImplementation(async (callback: any) => {
                 return callback({
@@ -27,7 +27,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'vehicle-1', startDate: startDate.toISOString(), endDate: endDate.toISOString() },
+                    { vehicleId: 'vehicle-1', startDate: startDate.toISOString(), endDate: endDate.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow(AppError);
@@ -39,7 +39,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'vehicle-1', startDate: pastDate.toISOString(), endDate: endDate.toISOString() },
+                    { vehicleId: 'vehicle-1', startDate: pastDate.toISOString(), endDate: endDate.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow('Impossible de créer une réservation dans le passé');
@@ -47,8 +47,8 @@ describe('BookingService', () => {
     });
 
     describe('Détection des chevauchements de réservation', () => {
-        const futureStart = new Date(Date.now() + 86400000 * 5); // Dans 5 jours
-        const futureEnd = new Date(Date.now() + 86400000 * 10); // Dans 10 jours
+        const futureStart = new Date(Date.now() + 86400000 * 5); 
+        const futureEnd = new Date(Date.now() + 86400000 * 10); 
 
         it('devrait rejeter une réservation qui chevauche une réservation existante (cas 1: nouvelle réservation englobe)', async () => {
             mockPrisma.$transaction.mockImplementation(async (callback: any) => {
@@ -72,7 +72,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString() },
+                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow(ConflictError);
@@ -100,7 +100,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString() },
+                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow(ConflictError);
@@ -128,7 +128,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString() },
+                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow(ConflictError);
@@ -156,7 +156,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString() },
+                    { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow(ConflictError);
@@ -187,7 +187,7 @@ describe('BookingService', () => {
             const newEnd = new Date(Date.now() + 86400000 * 4);
 
             const result = await bookingService.create(
-                { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString() },
+                { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                 'user-1'
             );
 
@@ -220,7 +220,7 @@ describe('BookingService', () => {
             const newEnd = new Date(Date.now() + 86400000 * 20);
 
             const result = await bookingService.create(
-                { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString() },
+                { vehicleId: 'vehicle-1', startDate: newStart.toISOString(), endDate: newEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                 'user-1'
             );
 
@@ -249,7 +249,7 @@ describe('BookingService', () => {
             });
 
             const result = await bookingService.create(
-                { vehicleId: 'vehicle-1', startDate: futureStart.toISOString(), endDate: futureEnd.toISOString() },
+                { vehicleId: 'vehicle-1', startDate: futureStart.toISOString(), endDate: futureEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                 'user-1'
             );
 
@@ -272,7 +272,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'non-existent', startDate: futureStart.toISOString(), endDate: futureEnd.toISOString() },
+                    { vehicleId: 'non-existent', startDate: futureStart.toISOString(), endDate: futureEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow(NotFoundError);
@@ -291,7 +291,7 @@ describe('BookingService', () => {
 
             await expect(
                 bookingService.create(
-                    { vehicleId: 'vehicle-1', startDate: futureStart.toISOString(), endDate: futureEnd.toISOString() },
+                    { vehicleId: 'vehicle-1', startDate: futureStart.toISOString(), endDate: futureEnd.toISOString(), reason: 'Test', destination: 'Lomé' },
                     'user-1'
                 )
             ).rejects.toThrow(ConflictError);
@@ -386,6 +386,183 @@ describe('BookingService', () => {
             const result = await bookingService.findById('booking-1', 'admin-1', 'ADMIN');
 
             expect(result).toEqual(booking);
+        });
+    });
+
+    describe('Modification de réservation', () => {
+        const futureStart = new Date(Date.now() + 86400000 * 5);
+        const futureEnd = new Date(Date.now() + 86400000 * 10);
+
+        it('devrait rejeter la modification d\'une réservation annulée', async () => {
+            mockPrisma.booking.findUnique.mockResolvedValue({
+                id: 'booking-1',
+                userId: 'user-1',
+                vehicleId: 'vehicle-1',
+                startDate: futureStart,
+                endDate: futureEnd,
+                status: 'CANCELLED',
+                vehicle: { id: 'vehicle-1', brand: 'Toyota', model: 'Corolla' },
+                user: { id: 'user-1', firstName: 'John', lastName: 'Doe', email: 'john@test.com' },
+            });
+
+            await expect(
+                bookingService.update('booking-1', { reason: 'Nouveau motif' }, 'user-1', 'EMPLOYEE')
+            ).rejects.toThrow('Impossible de modifier une réservation annulée');
+        });
+
+        it('devrait rejeter la modification d\'une réservation passée', async () => {
+            mockPrisma.booking.findUnique.mockResolvedValue({
+                id: 'booking-1',
+                userId: 'user-1',
+                vehicleId: 'vehicle-1',
+                startDate: new Date(Date.now() - 86400000 * 5),
+                endDate: new Date(Date.now() - 86400000 * 2),
+                status: 'CONFIRMED',
+                vehicle: { id: 'vehicle-1', brand: 'Toyota', model: 'Corolla' },
+                user: { id: 'user-1', firstName: 'John', lastName: 'Doe', email: 'john@test.com' },
+            });
+
+            await expect(
+                bookingService.update('booking-1', { reason: 'Nouveau motif' }, 'user-1', 'EMPLOYEE')
+            ).rejects.toThrow('Impossible de modifier une réservation passée ou en cours');
+        });
+
+        it('devrait rejeter la modification si chevauchement de dates', async () => {
+            mockPrisma.booking.findUnique.mockResolvedValue({
+                id: 'booking-1',
+                userId: 'user-1',
+                vehicleId: 'vehicle-1',
+                startDate: futureStart,
+                endDate: futureEnd,
+                status: 'CONFIRMED',
+                vehicle: { id: 'vehicle-1', brand: 'Toyota', model: 'Corolla' },
+                user: { id: 'user-1', firstName: 'John', lastName: 'Doe', email: 'john@test.com' },
+            });
+
+            mockPrisma.$transaction.mockImplementation(async (callback: any) => {
+                return callback({
+                    booking: {
+                        findFirst: jest.fn().mockResolvedValue({
+                            id: 'other-booking',
+                            vehicleId: 'vehicle-1',
+                            startDate: new Date(futureStart.getTime() + 86400000),
+                            endDate: new Date(futureEnd.getTime() + 86400000),
+                            status: 'CONFIRMED',
+                        }),
+                        update: jest.fn(),
+                    },
+                });
+            });
+
+            const newStart = new Date(futureStart.getTime() + 86400000);
+            const newEnd = new Date(futureEnd.getTime() + 86400000 * 2);
+
+            await expect(
+                bookingService.update(
+                    'booking-1',
+                    { startDate: newStart.toISOString(), endDate: newEnd.toISOString() },
+                    'user-1',
+                    'EMPLOYEE'
+                )
+            ).rejects.toThrow(ConflictError);
+        });
+
+        it('devrait permettre la modification sans chevauchement', async () => {
+            const updatedBooking = {
+                id: 'booking-1',
+                userId: 'user-1',
+                vehicleId: 'vehicle-1',
+                startDate: new Date(futureStart.getTime() + 86400000 * 15),
+                endDate: new Date(futureEnd.getTime() + 86400000 * 20),
+                status: 'CONFIRMED',
+                destination: 'Kara',
+                reason: 'Nouveau motif',
+                vehicle: { id: 'vehicle-1', brand: 'Toyota', model: 'Corolla' },
+                user: { id: 'user-1', firstName: 'John', lastName: 'Doe', email: 'john@test.com' },
+            };
+
+            mockPrisma.booking.findUnique.mockResolvedValue({
+                id: 'booking-1',
+                userId: 'user-1',
+                vehicleId: 'vehicle-1',
+                startDate: futureStart,
+                endDate: futureEnd,
+                status: 'CONFIRMED',
+                vehicle: { id: 'vehicle-1', brand: 'Toyota', model: 'Corolla' },
+                user: { id: 'user-1', firstName: 'John', lastName: 'Doe', email: 'john@test.com' },
+            });
+
+            mockPrisma.$transaction.mockImplementation(async (callback: any) => {
+                return callback({
+                    booking: {
+                        findFirst: jest.fn().mockResolvedValue(null),
+                        update: jest.fn().mockResolvedValue(updatedBooking),
+                    },
+                });
+            });
+
+            const newStart = new Date(futureStart.getTime() + 86400000 * 15);
+            const newEnd = new Date(futureEnd.getTime() + 86400000 * 20);
+
+            const result = await bookingService.update(
+                'booking-1',
+                { startDate: newStart.toISOString(), endDate: newEnd.toISOString(), destination: 'Kara', reason: 'Nouveau motif' },
+                'user-1',
+                'EMPLOYEE'
+            );
+
+            expect(result).toEqual(updatedBooking);
+            expect(result.destination).toBe('Kara');
+        });
+
+        it('devrait refuser à un employé de modifier la réservation d\'un autre', async () => {
+            mockPrisma.booking.findUnique.mockResolvedValue({
+                id: 'booking-1',
+                userId: 'other-user',
+                vehicleId: 'vehicle-1',
+                startDate: futureStart,
+                endDate: futureEnd,
+                status: 'CONFIRMED',
+            });
+
+            await expect(
+                bookingService.update('booking-1', { reason: 'Test' }, 'user-1', 'EMPLOYEE')
+            ).rejects.toThrow(UnauthorizedError);
+        });
+    });
+
+    describe('Suppression de réservation (Admin uniquement)', () => {
+        it('devrait rejeter la suppression par un employé', async () => {
+            await expect(
+                bookingService.delete('booking-1', 'EMPLOYEE')
+            ).rejects.toThrow('Seul un administrateur peut supprimer une réservation');
+        });
+
+        it('devrait rejeter la suppression d\'une réservation inexistante', async () => {
+            mockPrisma.booking.findUnique.mockResolvedValue(null);
+
+            await expect(
+                bookingService.delete('non-existent', 'ADMIN')
+            ).rejects.toThrow(NotFoundError);
+        });
+
+        it('devrait permettre à un admin de supprimer une réservation', async () => {
+            mockPrisma.booking.findUnique.mockResolvedValue({
+                id: 'booking-1',
+                userId: 'user-1',
+                vehicleId: 'vehicle-1',
+                startDate: new Date(),
+                endDate: new Date(),
+                status: 'CONFIRMED',
+            });
+
+            mockPrisma.booking.delete.mockResolvedValue({});
+
+            await expect(bookingService.delete('booking-1', 'ADMIN')).resolves.toBeUndefined();
+
+            expect(mockPrisma.booking.delete).toHaveBeenCalledWith({
+                where: { id: 'booking-1' }
+            });
         });
     });
 });

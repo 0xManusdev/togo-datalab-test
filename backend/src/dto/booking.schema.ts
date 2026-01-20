@@ -1,12 +1,14 @@
 import { z } from 'zod';
 
-export const createBookingSchema = z.object({
+const bookingBaseSchema = z.object({
     vehicleId: z.string().uuid('ID véhicule invalide'),
     startDate: z.string().datetime({ message: 'Date de début invalide' }),
     endDate: z.string().datetime({ message: 'Date de fin invalide' }),
     reason: z.string().min(5, 'Le motif doit contenir au moins 5 caractères').max(500, 'Le motif ne peut pas dépasser 500 caractères'),
     destination: z.string().min(2, 'La destination doit contenir au moins 2 caractères').max(200, 'La destination ne peut pas dépasser 200 caractères'),
-}).refine(data => new Date(data.startDate) < new Date(data.endDate), {
+});
+
+export const createBookingSchema = bookingBaseSchema.refine(data => new Date(data.startDate) < new Date(data.endDate), {
     message: 'La date de fin doit être après la date de début',
     path: ['endDate']
 }).refine(data => new Date(data.startDate) >= new Date(), {
@@ -22,3 +24,18 @@ export const queryBookingsSchema = z.object({
 
 export type CreateBookingDTO = z.infer<typeof createBookingSchema>;
 export type QueryBookingsDTO = z.infer<typeof queryBookingsSchema>;
+
+export const updateBookingSchema = bookingBaseSchema.partial().refine(
+    (data) => {
+        if (data.startDate && data.endDate) {
+            return new Date(data.startDate) < new Date(data.endDate);
+        }
+        return true;
+    },
+    {
+        message: 'La date de fin doit être après la date de début',
+        path: ['endDate'],
+    }
+);
+
+export type UpdateBookingDTO = z.infer<typeof updateBookingSchema>;

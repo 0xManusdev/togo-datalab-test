@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Bell, LogOut, Moon, Sun, User } from "lucide-react";
+import { Bell, LogOut, Menu, Moon, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,14 @@ import {
     DropdownMenuTrigger,
     DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { useUIStore } from "@/stores/useUIStore";
 
 export function Header() {
 	const { user, logout } = useAuth();
 	const { theme, setTheme } = useTheme();
+	const { toggleMobileMenu } = useUIStore();
 	const router = useRouter();
 
 	const handleLogout = async () => {
@@ -26,15 +27,19 @@ export function Header() {
 		router.push("/login");
 	};
 
-	const initials = user
-		? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
-		: "?";
-
 	return (
-		<header className="sticky top-0 z-30 flex h-16 items-center justify-between border-none bg-background px-6">
+		<header className="sticky top-0 z-30 flex h-14 items-center justify-between border-none bg-background px-6">
 			<div className="flex items-center gap-4">
-				<h1 className="text-lg font-normal">
-					Bienvenue, <span className="font-bold">{user?.firstName} !</span>
+				<Button
+					variant="ghost"
+					size="icon"
+					className="md:hidden"
+					onClick={toggleMobileMenu}
+				>
+					<Menu className="h-5 w-5" />
+				</Button>
+				<h1 className="text-sm font-medium">
+					Bienvenue, <span className="font-semibold">{user?.firstName} !</span>
 				</h1>
 			</div>
 
@@ -59,14 +64,9 @@ export function Header() {
 							</Avatar>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={() => router.push("/profile")}>
-								<User className="h-4 w-4" />
-								Profile
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+							<DropdownMenuItem onClick={handleLogout} className="text-destructive text-xs cursor-pointer focus:text-destructive">
 								<LogOut className="h-4 w-4" />
-								Sign out
+								Déconnexion
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

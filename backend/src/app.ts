@@ -3,16 +3,16 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import { logger } from './config/logger';
-import { AppError } from './errors/AppError';
-import { authRateLimiter, apiRateLimiter } from './middleware/rateLimit.middleware';
-import { prisma } from './utils/prisma';
+import { logger } from '@/config/logger';
+import { AppError } from '@/errors/AppError';
+import { authRateLimiter, apiRateLimiter } from '@/middleware/rateLimit.middleware';
+import { prisma } from '@/utils/prisma';
 
-import authRoutes from './routes/auth.routes';
-import vehicleRoutes from './routes/vehicle.routes';
-import bookingRoutes from './routes/booking.routes';
-import userRoutes from './routes/user.routes';
-import { config } from './config/environment';
+import authRoutes from '@/routes/auth.routes';
+import vehicleRoutes from '@/routes/vehicle.routes';
+import bookingRoutes from '@/routes/booking.routes';
+import userRoutes from '@/routes/user.routes';
+import { config } from '@/config/environment';
 
 const app: Application = express();
 

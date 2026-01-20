@@ -137,6 +137,61 @@ export class BookingService {
         });
     }
 
+    async update(id: string, data: Partial<CreateBookingDTO>, userId: string, role: string) {
+        const booking = await this.findById(id, userId, role);
+
+        if (booking.status === 'CANCELLED') {
+            throw new AppError('Impossible de modifier une réservation annulée');
+        }
+
+        if (new Date(booking.startDate) < new Date()) {
+            throw new AppError('Impossible de modifier une réservation passée ou en cours');
+        }
+
+        const startDate = data.startDate ? new Date(data.startDate) : new Date(booking.startDate);
+        const endDate = data.endDate ? new Date(data.endDate) : new Date(booking.endDate);
+        const vehicleId = data.vehicleId || booking.vehicleId;
+
+        if (data.startDate || data.endDate) {
+            this.validateDates(startDate, endDate);
+        }
+
+        return prisma.$transaction(async (tx) => {
+            if (data.startDate || data.endDate || data.vehicleId) {
+                const hasOverlap = await this.checkOverlapInTransaction(
+                    tx,
+                    vehicleId,
+                    startDate,
+                    endDate,
+                    id
+                );
+
+                if (hasOverlap) {
+                    throw new ConflictError(
+                        'Ce véhicule est déjà réservé sur cette période. Veuillez choisir d\'autres dates.'
+                    );
+                }
+            }
+
+            return tx.booking.update({
+                where: { id },
+                data: {
+                    startDate,
+                    endDate,
+                    vehicleId,
+                    destination: data.destination,
+                    reason: data.reason
+                },
+                include: {
+                    vehicle: true,
+                    user: {
+                        select: { id: true, firstName: true, lastName: true, email: true }
+                    }
+                }
+            });
+        });
+    }
+
     async cancel(id: string, userId: string, role: string) {
         const booking = await this.findById(id, userId, role);
 
@@ -153,6 +208,19 @@ export class BookingService {
             data: { status: 'CANCELLED' },
             include: { vehicle: true }
         });
+    }
+
+    async delete(id: string, role: string) {
+        if (role !== 'ADMIN') {
+            throw new UnauthorizedError('Seul un administrateur peut supprimer une réservation');
+        }
+
+        const booking = await prisma.booking.findUnique({ where: { id } });
+        if (!booking) {
+            throw new NotFoundError('Réservation non trouvée');
+        }
+
+        await prisma.booking.delete({ where: { id } });
     }
 
     async getVehicleBookings(vehicleId: string) {

@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
-import { BookingService } from '../services/booking.service';
-import { AuthRequest } from '../middleware/auth.middleware';
-import { paginationSchema } from '../utils/pagination';
+import { BookingService } from '@/services/booking.service';
+import { AuthRequest } from '@/middleware/auth.middleware';
+import { paginationSchema } from '@/utils/pagination';
 
 export class BookingController {
     private bookingService: BookingService;
@@ -60,6 +60,29 @@ export class BookingController {
         }
     };
 
+    public update = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { id } = req.params;
+            if (typeof id !== 'string') {
+                res.status(400).json({ status: 'error', message: 'ID invalide' });
+                return;
+            }
+            const booking = await this.bookingService.update(
+                id,
+                req.body,
+                req.user!.userId,
+                req.user!.role
+            );
+            res.json({
+                status: 'success',
+                message: 'Réservation mise à jour',
+                data: booking
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
     public cancel = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id } = req.params;
@@ -91,6 +114,20 @@ export class BookingController {
             }
             const bookings = await this.bookingService.getVehicleBookings(vehicleId);
             res.json({ status: 'success', data: bookings });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    public delete = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { id } = req.params;
+            if (typeof id !== 'string') {
+                res.status(400).json({ status: 'error', message: 'ID invalide' });
+                return;
+            }
+            await this.bookingService.delete(id, req.user!.role);
+            res.status(204).send();
         } catch (error) {
             next(error);
         }

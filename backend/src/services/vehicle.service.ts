@@ -1,7 +1,7 @@
-import { prisma } from '../utils/prisma';
-import { CreateVehicleDTO, UpdateVehicleDTO } from '../dto/vehicle.schema';
-import { ConflictError, NotFoundError } from '../errors/AppError';
-import { createPaginatedResponse } from '../utils/pagination';
+import { prisma } from '@/utils/prisma';
+import { CreateVehicleDTO, UpdateVehicleDTO } from '@/dto/vehicle.schema';
+import { ConflictError, NotFoundError } from '@/errors/AppError';
+import { createPaginatedResponse } from '@/utils/pagination';
 
 export class VehicleService {
     async findAll(page: number = 1, limit: number = 20) {

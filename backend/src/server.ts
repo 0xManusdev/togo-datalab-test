@@ -2,10 +2,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-import app from './app';
-import { config } from './config/environment';
+import app from '@/app';
+import { config } from '@/config/environment';
 import { logger } from '@/config/logger'
-import { prisma } from './utils/prisma';
+import { prisma } from '@/utils/prisma';
 
 const PORT = config.port || 8000;
 

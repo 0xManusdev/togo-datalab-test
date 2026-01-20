@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { LoginDTO, RegisterDTO } from '../dto/auth.schema';
-import { prisma } from '../utils/prisma';
+import { LoginDTO } from '@/dto/auth.schema';
+import { prisma } from '@/utils/prisma';
 import { config } from '@/config/environment';
-import { AppError, ConflictError, UnauthorizedError } from '@/errors/AppError';
+import { AppError, UnauthorizedError } from '@/errors/AppError';
 
 
 export class AuthService {

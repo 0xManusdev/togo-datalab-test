@@ -28,7 +28,7 @@ export function StatsCard({
                 {loading ? (
                     <Skeleton className="h-8 w-20" />
                 ) : (
-                    <div className="text-2xl font-bold">{value}</div>
+                    <div className="text-xl font-semibold">{value}</div>
                 )}
                 <p className="text-xs text-muted-foreground">{description}</p>
             </CardContent>

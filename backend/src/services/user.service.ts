@@ -1,7 +1,7 @@
-import { prisma } from '../utils/prisma';
-import { RegisterDTO } from '../dto/auth.schema';
-import { ConflictError, NotFoundError } from '../errors/AppError';
-import { createPaginatedResponse } from '../utils/pagination';
+import { prisma } from '@/utils/prisma';
+import { RegisterDTO } from '@/dto/auth.schema';
+import { ConflictError, NotFoundError } from '@/errors/AppError';
+import { createPaginatedResponse } from '@/utils/pagination';
 import bcrypt from 'bcryptjs';
 
 export class UserService {

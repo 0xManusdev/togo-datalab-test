@@ -86,12 +86,10 @@ export default function DashboardPage() {
                 />
             </div>
 
-            {/* Recent Bookings & Available Vehicles */}
             <div className="grid gap-6 lg:grid-cols-2">
-                {/* Upcoming Bookings */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Prochaines réservations</CardTitle>
+                        <CardTitle className="text-sm">Prochaines réservations</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {bookingsLoading ? (
@@ -106,13 +104,12 @@ export default function DashboardPage() {
                             </p>
                         ) : (
                             <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
+                                <table className="w-full text-xs">
                                     <thead>
                                         <tr className="border-b text-left text-muted-foreground">
                                             <th className="pb-2 font-medium">Véhicule</th>
                                             <th className="pb-2 font-medium">Utilisateur</th>
                                             <th className="pb-2 font-medium">Destination</th>
-                                            <th className="pb-2 font-medium">Période</th>
                                             <th className="pb-2 font-medium">Statut</th>
                                         </tr>
                                     </thead>
@@ -123,16 +120,13 @@ export default function DashboardPage() {
                                                     {booking.vehicle.brand} {booking.vehicle.model}
                                                 </td>
                                                 <td className="py-3">
-                                                    {booking.user?.firstName} {booking.user?.lastName}
+                                                    M.{booking.user?.lastName}
                                                 </td>
                                                 <td className="py-3 text-muted-foreground">
                                                     {booking.destination || "-"}
                                                 </td>
-                                                <td className="py-3 text-muted-foreground whitespace-nowrap">
-                                                    {formatDate(booking.startDate)} - {formatDate(booking.endDate)}
-                                                </td>
                                                 <td className="py-3">
-                                                    <Badge variant="success">Confirmée</Badge>
+                                                    <Badge variant="success" className="font-light text-[10px]">Confirmée</Badge>
                                                 </td>
                                             </tr>
                                         ))}
@@ -145,7 +139,7 @@ export default function DashboardPage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Véhicules disponibles</CardTitle>
+                        <CardTitle className="text-sm">Véhicules disponibles</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {vehiclesLoading ? (
@@ -169,17 +163,17 @@ export default function DashboardPage() {
                                 {availableVehicles.slice(0, 5).map((vehicle) => (
                                     <div
                                         key={vehicle.id}
-                                        className="flex items-center justify-between rounded-lg border p-4"
+                                        className="flex items-center justify-between rounded-lg border p-2"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <p className="font-medium">
+                                            <p className="font-medium text-xs">
                                                 {vehicle.brand} {vehicle.model}
                                             </p>
-                                            <p className="text-sm text-muted-foreground">
+                                            <p className="text-xs text-muted-foreground">
                                                 {vehicle.licensePlate}
                                             </p>
                                         </div>
-                                        <Badge variant="success">Disponible</Badge>
+                                        <Badge variant="success" className="text-xs font-light">Disponible</Badge>
                                     </div>
                                 ))}
                             </div>
