@@ -70,7 +70,11 @@ app.use((req: Request, res: Response) => {
 });
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    logger.error(err.message, { stack: err.stack });
+    logger.error(err.message, { 
+        stack: config.nodeEnv === 'development' ? err.stack : undefined,
+        path: req.path,
+        method: req.method
+    });
 
     if (err instanceof AppError) {
         res.status(err.statusCode).json({

@@ -24,7 +24,6 @@ export function MobileSidebar() {
 
     const isAdmin = user?.role === "ADMIN";
 
-    // Close menu on route change
     useEffect(() => {
         setMobileMenuOpen(false);
     }, [pathname, setMobileMenuOpen]);
@@ -40,13 +39,10 @@ export function MobileSidebar() {
 
     return (
         <div className="fixed inset-0 z-50 flex md:hidden">
-            {/* Backdrop */}
             <div 
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in-0"
                 onClick={() => setMobileMenuOpen(false)}
             />
-
-            {/* Sidebar Content */}
             <div className="relative flex w-3/4 max-w-xs flex-col bg-background shadow-xl animate-in slide-in-from-left duration-300">
                 <div className="flex h-16 items-center justify-between border-b px-4">
                     <span className="text-xl font-bold text-primary">Carrent</span>

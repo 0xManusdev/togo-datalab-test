@@ -1,6 +1,6 @@
-import { registerSchema, loginSchema } from '@/dto/auth.schema';
-import { createBookingSchema } from '@/dto/booking.schema';
-import { createVehicleSchema, updateVehicleSchema, availableVehiclesQuerySchema } from '@/dto/vehicle.schema';
+import { registerSchema, loginSchema } from '../../../src/dto/auth.schema';
+import { createBookingSchema } from '../../../src/dto/booking.schema';
+import { createVehicleSchema, updateVehicleSchema, availableVehiclesQuerySchema } from '../../../src/dto/vehicle.schema';
 
 describe('Schémas de Validation Zod', () => {
 
@@ -10,7 +10,7 @@ describe('Schémas de Validation Zod', () => {
             it('devrait valider des données d\'inscription correctes', () => {
                 const validData = {
                     email: 'test@example.com',
-                    password: 'Password123',
+                    password: 'SecureP@ss123!',
                     firstName: 'John',
                     lastName: 'Doe',
                     phone: '+22890000000',
@@ -23,7 +23,7 @@ describe('Schémas de Validation Zod', () => {
             it('devrait rejeter un email invalide', () => {
                 const invalidData = {
                     email: 'not-an-email',
-                    password: 'Password123',
+                    password: 'SecureP@ss123!',
                     firstName: 'John',
                     lastName: 'Doe',
                     phone: '+22890000000',
@@ -33,10 +33,10 @@ describe('Schémas de Validation Zod', () => {
                 expect(result.success).toBe(false);
             });
 
-            it('devrait rejeter un mot de passe trop court (< 8 caractères)', () => {
+            it('devrait rejeter un mot de passe trop court (< 12 caractères)', () => {
                 const invalidData = {
                     email: 'test@example.com',
-                    password: '1234567', // 7 caractères
+                    password: 'Short@123', // 9 caractères, trop court
                     firstName: 'John',
                     lastName: 'Doe',
                     phone: '+22890000000',
@@ -49,7 +49,7 @@ describe('Schémas de Validation Zod', () => {
             it('devrait rejeter un prénom trop court', () => {
                 const invalidData = {
                     email: 'test@example.com',
-                    password: 'Password123',
+                    password: 'SecureP@ss123!',
                     firstName: 'J', // 1 caractère
                     lastName: 'Doe',
                     phone: '+22890000000',
@@ -62,7 +62,7 @@ describe('Schémas de Validation Zod', () => {
             it('devrait rejeter un numéro de téléphone au format incorrect', () => {
                 const invalidData = {
                     email: 'test@example.com',
-                    password: 'Password123',
+                    password: 'SecureP@ss123!',
                     firstName: 'John',
                     lastName: 'Doe',
                     phone: '0612345678', // Pas de + au début
@@ -75,7 +75,7 @@ describe('Schémas de Validation Zod', () => {
             it('devrait accepter un numéro de téléphone au format +XXX XXXXXXXX', () => {
                 const validData = {
                     email: 'test@example.com',
-                    password: 'Password123',
+                    password: 'SecureP@ss123!',
                     firstName: 'John',
                     lastName: 'Doe',
                     phone: '+22890123456',
@@ -90,17 +90,17 @@ describe('Schémas de Validation Zod', () => {
             it('devrait valider des identifiants corrects', () => {
                 const validData = {
                     email: 'test@example.com',
-                    password: 'Password123',
+                    password: 'SecureP@ss123!',
                 };
 
                 const result = loginSchema.safeParse(validData);
                 expect(result.success).toBe(true);
             });
 
-            it('devrait rejeter un mot de passe trop court (< 8 caractères)', () => {
+            it('devrait rejeter un mot de passe trop court (< 12 caractères)', () => {
                 const invalidData = {
                     email: 'test@example.com',
-                    password: '1234567', // 7 caractères
+                    password: 'Short@123', // 9 caractères, trop court
                 };
 
                 const result = loginSchema.safeParse(invalidData);

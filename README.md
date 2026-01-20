@@ -2,9 +2,11 @@
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-4169E1?logo=postgresql&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-71%20passed-brightgreen)
 
 > **Contexte et Objectif** : Ce projet, réalisé dans le cadre du test technique de recrutement pour le **Togo Data Lab**, est une application web de gestion de réservation de véhicules dont l'objectif est de permettre aux utilisateurs de réserver des véhicules en fonction de leurs disponibilités tout en empêchant les conflits d'usage ou chevauchement de réservations, garantissant ainsi la continuité des missions.
 
@@ -178,7 +180,8 @@ Pour éviter les incohérences liées aux décalages horaires (ex: réservation 
 - **Vérification de Disponibilité** : Moteur algorithmique anti-chevauchement.
 - **Interface de Recherche** : Filtrage par dates et visualisation des véhicules disponibles.
 - **Modification/Annulation** : Les utilisateurs peuvent modifier ou annuler leurs réservations futures.
-- **Historique** : Suivi complet des réservations.
+- **Historique** : Suivi complet des réservations avec motif et destination.
+- **Suppression (Admin)** : Les administrateurs peuvent supprimer définitivement des réservations.
 
 ### Gestion des Utilisateurs (Admin)
 
@@ -209,8 +212,8 @@ cp .env.example .env
 DATABASE_URL="postgresql://user:password@localhost:5432/vehicle_booking"
 JWT_SECRET="votre_secret_tres_securise"
 PORT=8000
-SUPABASE_URL="https://votre-projet.supabase.co"
-SUPABASE_SERVICE_KEY="votre_cle_service_role"
+SUPABASE_URL="lien supabase"
+SUPABASE_SERVICE_KEY="clé_service_role"
 BUCKET_NAME="vehicle-images"
 ```
 
@@ -306,10 +309,11 @@ hooks/              # Hooks React personnalisés
 
 | Méthode | Endpoint | Description | Accès |
 |---------|----------|-------------|-------|
-| `GET` | `/api/vehicles` | Liste des véhicules | Authentifié |
-| `GET` | `/api/vehicles/available` | Véhicules disponibles | Authentifié |
-| `POST` | `/api/vehicles` | Ajouter un véhicule | Admin |
-| `PUT` | `/api/vehicles/:id` | Modifier un véhicule | Admin |
+| `GET` | `/api/vehicles` | Liste des véhicules (paginée) | Admin |
+| `GET` | `/api/vehicles/:id` | Détails d'un véhicule | Authentifié |
+| `GET` | `/api/vehicles/available` | Véhicules disponibles (par période) | Authentifié |
+| `POST` | `/api/vehicles` | Ajouter un véhicule (multipart/form-data) | Admin |
+| `PUT` | `/api/vehicles/:id` | Modifier un véhicule (multipart/form-data) | Admin |
 | `DELETE` | `/api/vehicles/:id` | Supprimer un véhicule | Admin |
 
 ### Réservations
@@ -334,8 +338,36 @@ hooks/              # Hooks React personnalisés
 
 ---
 
+## Tests
+
+Le projet inclut une suite de tests unitaires complète pour le backend :
+
+```bash
+cd backend
+npm test
+```
+
+| Suite | Tests |
+|-------|-------|
+| **BookingService** | 24 tests (création, dates, chevauchement, annulation, modification, suppression) |
+| **VehicleService** | 11 tests (CRUD, disponibilité, suppression avec réservations) |
+| **AuthService** | 7 tests (login, getUserById, messages d'erreur unifiés) |
+| **AuthMiddleware** | 7 tests (authentification, autorisation admin) |
+| **SchémasZod** | 22 tests (validation entrées) |
+| **Total** | **71 tests** |
+
+### Collection Postman
+
+Une collection Postman est disponible dans `backend/postman/collection.json` avec :
+- Tous les endpoints documentés
+- Variables d'environnement préconfigurées
+- Tests automatisés intégrés
+
+---
+
 ## Perspectives d'Évolution
 
+- **Token Blacklist** : Invalidation des tokens JWT à la déconnexion.
 - **Containerisation (Docker)** : Faciliter le déploiement CI/CD.
 - **Système de Notifications** : Emails de confirmation et rappels.
 - **Module Analytique** : Tableau de bord statistique.

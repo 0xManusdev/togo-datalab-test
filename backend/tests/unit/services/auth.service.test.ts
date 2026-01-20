@@ -1,5 +1,5 @@
-import { AuthService } from '@/services/auth.service';
-import { ConflictError, UnauthorizedError, AppError } from '@/errors/AppError';
+import { AuthService } from '../../../src/services/auth.service';
+import { AppError } from '../../../src/errors/AppError';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { mockPrisma } from '../../setup';

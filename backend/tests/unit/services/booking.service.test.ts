@@ -1,5 +1,5 @@
-import { BookingService } from '@/services/booking.service';
-import { AppError, ConflictError, NotFoundError, UnauthorizedError } from '@/errors/AppError';
+import { BookingService } from '../../../src/services/booking.service';
+import { AppError, ConflictError, NotFoundError, UnauthorizedError } from '../../../src/errors/AppError';
 import { mockPrisma } from '../../setup';
 
 describe('BookingService', () => {

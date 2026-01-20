@@ -10,9 +10,8 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-    console.log('🌱 Début du seeding...');
+    console.log('Début du seeding...');
 
-    // Vérifier si un admin existe déjà
     const adminExists = await prisma.user.findFirst({
         where: { role: 'ADMIN' }
     });
@@ -22,7 +21,6 @@ async function main() {
         return;
     }
 
-    // Créer l'administrateur par défaut
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123456';
 
@@ -43,7 +41,6 @@ async function main() {
     console.log(`   Email: ${admin.email}`);
     console.log(`   Rôle: ${admin.role}`);
 
-    // Créer quelques véhicules de démonstration
     const vehicles = await prisma.vehicle.createMany({
         data: [
             {

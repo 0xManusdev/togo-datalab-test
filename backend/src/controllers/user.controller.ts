@@ -1,13 +1,8 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '@/middleware/auth.middleware';
 import { UserService } from '@/services/user.service';
-import { registerSchema } from '@/dto/auth.schema';
 import { paginationSchema } from '@/utils/pagination';
-import { z } from 'zod';
 
-const createUserSchema = registerSchema.extend({
-    role: z.enum(['ADMIN', 'EMPLOYEE']).default('EMPLOYEE'),
-});
 
 export class UserController {
     private userService: UserService;
@@ -46,17 +41,7 @@ export class UserController {
 
     public create = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const validationResult = createUserSchema.safeParse(req.body);
-            if (!validationResult.success) {
-                res.status(400).json({
-                    status: 'error',
-                    message: 'Données invalides',
-                    errors: validationResult.error.flatten().fieldErrors
-                });
-                return;
-            }
-
-            const user = await this.userService.create(validationResult.data);
+            const user = await this.userService.create(req.body);
             res.status(201).json({ status: 'success', data: user });
         } catch (error) {
             next(error);
