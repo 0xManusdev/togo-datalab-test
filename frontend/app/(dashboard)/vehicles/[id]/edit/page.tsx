@@ -5,16 +5,27 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { useVehicle, useUpdateVehicle } from "@/hooks/useVehicles";
-import { updateVehicleSchema, UpdateVehicleInput } from "@/lib/validations";
 import { ApiError } from "@/lib/api";
 import Link from "next/link";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+  brand: z.string().min(1, "La marque est requise").optional(),
+  model: z.string().min(1, "Le modèle est requis").optional(),
+  licensePlate: z.string().min(1, "La plaque est requise").optional(),
+  isAvailable: z.boolean().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function EditVehiclePage({
   params,
@@ -26,6 +37,7 @@ export default function EditVehiclePage({
   const { data, isLoading } = useVehicle(id);
   const updateVehicle = useUpdateVehicle();
   const [error, setError] = useState<string | null>(null);
+  const [image, setImage] = useState<File | string | null>(null);
 
   const vehicle = data?.data;
 
@@ -34,8 +46,8 @@ export default function EditVehiclePage({
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<UpdateVehicleInput>({
-    resolver: zodResolver(updateVehicleSchema),
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
   });
 
   useEffect(() => {
@@ -44,22 +56,25 @@ export default function EditVehiclePage({
         brand: vehicle.brand,
         model: vehicle.model,
         licensePlate: vehicle.licensePlate,
-        imageUrl: vehicle.imageUrl || "",
         isAvailable: vehicle.isAvailable,
       });
+      if (vehicle.imageUrl) {
+        setImage(vehicle.imageUrl);
+      }
     }
   }, [vehicle, reset]);
 
-  const onSubmit = async (data: UpdateVehicleInput) => {
+  const onSubmit = async (data: FormData) => {
     try {
       setError(null);
       await updateVehicle.mutateAsync({
         id,
         data: {
           ...data,
-          imageUrl: data.imageUrl || undefined,
+          image: image instanceof File ? image : null,
         },
       });
+      toast.success("Véhicule modifié avec succès");
       router.push(`/vehicles/${id}`);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -150,13 +165,12 @@ export default function EditVehiclePage({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="imageUrl">URL de l'image (optionnel)</Label>
-              <Input id="imageUrl" {...register("imageUrl")} />
-              {errors.imageUrl && (
-                <p className="text-sm text-destructive">
-                  {errors.imageUrl.message}
-                </p>
-              )}
+              <Label>Image du véhicule (optionnel)</Label>
+              <ImageUpload
+                value={image}
+                onChange={(file) => setImage(file)}
+                disabled={isSubmitting}
+              />
             </div>
 
             <div className="flex items-center gap-2">
