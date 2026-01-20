@@ -11,6 +11,7 @@ import { prisma } from './utils/prisma';
 import authRoutes from './routes/auth.routes';
 import vehicleRoutes from './routes/vehicle.routes';
 import bookingRoutes from './routes/booking.routes';
+import userRoutes from './routes/user.routes';
 import { config } from './config/environment';
 
 const app: Application = express();
@@ -59,6 +60,7 @@ app.get('/api/health', async (req: Request, res: Response) => {
 app.use('/api/auth', authRateLimiter, authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/users', userRoutes);
 
 app.use((req: Request, res: Response) => {
     res.status(404).json({ 
