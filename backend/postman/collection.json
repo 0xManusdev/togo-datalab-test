@@ -32,44 +32,21 @@
             "name": "Auth",
             "item": [
                 {
-                    "name": "[Deprecated] Register - New Employee",
-                    "request": {
-                        "description": "This endpoint has been removed. User creation is now handled by admin via /admin/users",
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"email\": \"employee@test.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"Jean\",\n    \"lastName\": \"Dupont\",\n    \"phone\": \"+22890123456\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{baseUrl}}/auth/register",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "register"
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Register - Admin User",
+                    "name": "Login - Admin",
                     "event": [
                         {
                             "listen": "test",
                             "script": {
                                 "exec": [
-                                    "if (pm.response.code === 201) {",
+                                    "if (pm.response.code === 200) {",
                                     "    const response = pm.response.json();",
-                                    "    pm.test('Admin registration successful', function() {",
+                                    "    pm.environment.set('token', response.data.token);",
+                                    "    pm.environment.set('adminToken', response.data.token);",
+                                    "    pm.environment.set('userId', response.data.user.id);",
+                                    "    pm.test('Admin login successful', function() {",
                                     "        pm.expect(response.status).to.eql('success');",
+                                    "        pm.expect(response.data.token).to.be.a('string');",
+                                    "        pm.expect(response.data.user.role).to.eql('ADMIN');",
                                     "    });",
                                     "}"
                                 ],
@@ -87,16 +64,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"admin123456\",\n    \"firstName\": \"Admin\",\n    \"lastName\": \"System\",\n    \"phone\": \"+22891234567\"\n}"
+                            "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"Admin@123456\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/auth/register",
+                            "raw": "{{baseUrl}}/auth/login",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "auth",
-                                "register"
+                                "login"
                             ]
                         }
                     },
@@ -113,7 +90,7 @@
                                     "    const response = pm.response.json();",
                                     "    pm.environment.set('token', response.data.token);",
                                     "    pm.environment.set('userId', response.data.user.id);",
-                                    "    pm.test('Login successful', function() {",
+                                    "    pm.test('Employee login successful', function() {",
                                     "        pm.expect(response.status).to.eql('success');",
                                     "        pm.expect(response.data.token).to.be.a('string');",
                                     "    });",
@@ -149,19 +126,140 @@
                     "response": []
                 },
                 {
-                    "name": "Login - Admin",
+                    "name": "Get Current User (Me)",
                     "event": [
                         {
                             "listen": "test",
                             "script": {
                                 "exec": [
-                                    "if (pm.response.code === 200) {",
+                                    "pm.test('Should return current user details', function() {",
+                                    "    pm.expect(pm.response.code).to.eql(200);",
                                     "    const response = pm.response.json();",
-                                    "    pm.environment.set('adminToken', response.data.token);",
-                                    "    pm.test('Admin login successful', function() {",
-                                    "        pm.expect(response.status).to.eql('success');",
-                                    "        pm.expect(response.data.token).to.be.a('string');",
-                                    "    });",
+                                    "    pm.expect(response.data).to.have.property('id');",
+                                    "    pm.expect(response.data.id).to.eql(pm.environment.get('userId'));",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "me"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Logout successful', function() {",
+                                    "    pm.expect(pm.response.code).to.eql(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Get All Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/{{userId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "{{userId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.environment.set('newUserId', response.data.id);",
                                     "}"
                                 ],
                                 "type": "text/javascript"
@@ -174,60 +272,77 @@
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"admin123456\"\n}"
+                            "raw": "{\n    \"email\": \"newuser@test.com\",\n    \"password\": \"Password123\",\n    \"firstName\": \"Test\",\n    \"lastName\": \"User\",\n    \"role\": \"EMPLOYEE\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/auth/login",
+                            "raw": "{{baseUrl}}/users",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "auth",
-                                "login"
+                                "users"
                             ]
                         }
                     },
                     "response": []
                 },
                 {
-                    "name": "Login - Invalid Credentials",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "pm.test('Should return 401 for invalid credentials', function() {",
-                                    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                                    "});"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
+                    "name": "Update User",
                     "request": {
-                        "method": "POST",
+                        "method": "PUT",
                         "header": [
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"wrong@test.com\",\n    \"password\": \"wrongpassword\"\n}"
+                            "raw": "{\n    \"firstName\": \"Updated\",\n    \"lastName\": \"Name\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/auth/login",
+                            "raw": "{{baseUrl}}/users/{{newUserId}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "auth",
-                                "login"
+                                "users",
+                                "{{newUserId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/{{newUserId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "{{newUserId}}"
                             ]
                         }
                     },
