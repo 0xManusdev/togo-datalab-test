@@ -203,7 +203,6 @@ export default function BookingsPage() {
                 </Card>
             )}
 
-            {/* Pagination */}
             {pagination && (
                 <Pagination
                     page={pagination.page}

@@ -70,4 +70,19 @@ export class UserController {
             next(error);
         }
     };
+
+    public update = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const { id } = req.params;
+            if (typeof id !== 'string') {
+                res.status(400).json({ status: 'error', message: 'ID invalide' });
+                return;
+            }
+
+            const user = await this.userService.update(id, req.body);
+            res.json({ status: 'success', data: user });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

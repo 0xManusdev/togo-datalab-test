@@ -92,4 +92,44 @@ export class UserService {
         
         await prisma.user.delete({ where: { id } });
     }
+
+    async update(id: string, data: Partial<Omit<RegisterDTO, 'password'> & { role?: 'ADMIN' | 'EMPLOYEE' }>) {
+        await this.findById(id);
+
+        if (data.email) {
+            const existingUser = await prisma.user.findFirst({
+                where: { 
+                    email: data.email,
+                    NOT: { id }
+                }
+            });
+
+            if (existingUser) {
+                throw new ConflictError('Un utilisateur avec cette adresse email existe déjà.');
+            }
+        }
+
+        const user = await prisma.user.update({
+            where: { id },
+            data: {
+                ...(data.email && { email: data.email }),
+                ...(data.firstName && { firstName: data.firstName }),
+                ...(data.lastName && { lastName: data.lastName }),
+                ...(data.phone !== undefined && { phone: data.phone }),
+                ...(data.role && { role: data.role }),
+            },
+            select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                phone: true,
+                role: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+
+        return user;
+    }
 }

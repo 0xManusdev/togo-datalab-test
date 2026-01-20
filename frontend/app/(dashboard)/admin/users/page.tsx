@@ -1,38 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Shield, Plus, Trash2, Loader2 } from "lucide-react";
+import { Users, Shield, Plus, Trash2, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Modal } from "@/components/ui/modal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
+import { UserFormModal, UserFormData } from "@/components/users/UserFormModal";
 import { useAuth } from "@/hooks/useAuth";
-import { useUsers, useCreateUser, useDeleteUser, CreateUserInput } from "@/hooks/useUsers";
+import { useUsers, useCreateUser, useDeleteUser, useUpdateUser } from "@/hooks/useUsers";
 import { handleError } from "@/lib/error-handler";
 import { toast } from "sonner";
+import { User } from "@/types";
 
 export default function AdminUsersPage() {
 	const { user: currentUser } = useAuth();
 	const { data, isLoading } = useUsers();
 	const createUser = useCreateUser();
 	const deleteUser = useDeleteUser();
+	const updateUser = useUpdateUser();
 
-	const [showCreateModal, setShowCreateModal] = useState(false);
+	const [showFormModal, setShowFormModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const [userToDelete, setUserToDelete] = useState<string | null>(null);
-	const [formData, setFormData] = useState<CreateUserInput>({
-		email: "",
-		password: "",
-		firstName: "",
-		lastName: "",
-		phone: "",
-		role: "EMPLOYEE",
-	});
 
 	if (currentUser?.role !== "ADMIN") {
 		return (
@@ -46,22 +39,34 @@ export default function AdminUsersPage() {
 
 	const users = data?.data || [];
 
-	const handleCreateUser = async (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleFormSubmit = async (formData: UserFormData) => {
 		try {
-			await createUser.mutateAsync(formData);
-			toast.success("Utilisateur créé avec succès");
-			setShowCreateModal(false);
-			setFormData({
-				email: "",
-				password: "",
-				firstName: "",
-				lastName: "",
-				phone: "",
-				role: "EMPLOYEE",
-			});
+			if (selectedUser) {
+				await updateUser.mutateAsync({ 
+					id: selectedUser.id, 
+					data: {
+						email: formData.email,
+						firstName: formData.firstName,
+						lastName: formData.lastName,
+						phone: formData.phone,
+						role: formData.role,
+					}
+				});
+				toast.success("Utilisateur modifié avec succès");
+			} else {
+				await createUser.mutateAsync({
+					email: formData.email,
+					password: formData.password!,
+					firstName: formData.firstName,
+					lastName: formData.lastName,
+					phone: formData.phone,
+					role: formData.role,
+				});
+				toast.success("Utilisateur créé avec succès");
+			}
+			closeFormModal();
 		} catch (error) {
-			handleError(error, "Création impossible");
+			handleError(error, selectedUser ? "Modification impossible" : "Création impossible");
 		}
 	};
 
@@ -77,6 +82,21 @@ export default function AdminUsersPage() {
 		}
 	};
 
+	const openCreateModal = () => {
+		setSelectedUser(null);
+		setShowFormModal(true);
+	};
+
+	const openEditModal = (user: User) => {
+		setSelectedUser(user);
+		setShowFormModal(true);
+	};
+
+	const closeFormModal = () => {
+		setShowFormModal(false);
+		setSelectedUser(null);
+	};
+
 	const openDeleteModal = (userId: string) => {
 		setUserToDelete(userId);
 		setShowDeleteModal(true);
@@ -88,7 +108,7 @@ export default function AdminUsersPage() {
 				title="Gestion des utilisateurs"
 				description="Gérez les utilisateurs de la plateforme"
 				action={
-					<Button onClick={() => setShowCreateModal(true)}>
+					<Button onClick={openCreateModal}>
 						<Plus className="mr-2 h-4 w-4" />
 						Nouvel utilisateur
 					</Button>
@@ -113,171 +133,77 @@ export default function AdminUsersPage() {
 							className="py-12"
 						/>
 					) : (
-
 						<div className="rounded-lg border overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <div className="min-w-[800px]">
-                                    <div className="border-b px-4 py-3 bg-muted/50">
-                                        <div className="grid grid-cols-5 text-xs font-medium text-muted-foreground">
-                                            <span>Nom</span>
-                                            <span>Email</span>
-                                            <span>Téléphone</span>
-                                            <span>Rôle</span>
-                                            <span>Actions</span>
-                                        </div>
-                                    </div>
-                                    <div className="divide-y">
-                                        {users.map((user) => (
-                                            <div
-                                                key={user.id}
-                                                className="grid grid-cols-5 items-center px-4 py-3 hover:bg-muted/50 transition-colors"
-                                            >
-                                                <span className="font-medium text-xs truncate pr-2">
-                                                    {user.firstName} {user.lastName}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground truncate pr-2">
-                                                    {user.email}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground truncate pr-2">
-                                                    {user.phone || "-"}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {user.role === "ADMIN" ? "Admin" : "Employé"}
-                                                </span>
-                                                <div>
-                                                    {user.id !== currentUser?.id && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="text-destructive hover:text-destructive h-8 w-8"
-                                                            onClick={() => openDeleteModal(user.id)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
+							<div className="overflow-x-auto">
+								<div className="min-w-[800px]">
+									<div className="border-b px-4 py-3 bg-muted/50">
+										<div className="grid grid-cols-5 text-xs font-medium text-muted-foreground">
+											<span>Nom</span>
+											<span>Email</span>
+											<span>Téléphone</span>
+											<span>Rôle</span>
+											<span>Actions</span>
+										</div>
+									</div>
+									<div className="divide-y">
+										{users.map((user) => (
+											<div
+												key={user.id}
+												className="grid grid-cols-5 items-center px-4 py-3 hover:bg-muted/50 transition-colors"
+											>
+												<span className="font-medium text-xs truncate pr-2">
+													{user.firstName} {user.lastName}
+												</span>
+												<span className="text-xs text-muted-foreground truncate pr-2">
+													{user.email}
+												</span>
+												<span className="text-xs text-muted-foreground truncate pr-2">
+													{user.phone || "-"}
+												</span>
+												<span className="text-xs text-muted-foreground">
+													{user.role === "ADMIN" ? "Admin" : "Employé"}
+												</span>
+												<div className="flex gap-1">
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8"
+														onClick={() => openEditModal(user)}
+													>
+														<Pencil className="h-4 w-4" />
+													</Button>
+													{user.id !== currentUser?.id && (
+														<Button
+															variant="ghost"
+															size="icon"
+															className="text-destructive hover:text-destructive h-8 w-8"
+															onClick={() => openDeleteModal(user.id)}
+														>
+															<Trash2 className="h-4 w-4" />
+														</Button>
+													)}
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+							</div>
 						</div>
 					)}
 				</CardContent>
 			</Card>
 
-			<Modal
-				isOpen={showCreateModal}
-				onClose={() => setShowCreateModal(false)}
-				title="Nouvel utilisateur"
-				description="Créer un nouveau compte utilisateur"
-			>
-				<form onSubmit={handleCreateUser} className="space-y-4">
-					<div className="grid gap-4 sm:grid-cols-2">
-						<div className="space-y-2">
-							<Label htmlFor="firstName">Prénom</Label>
-							<Input
-								id="firstName"
-								value={formData.firstName}
-								onChange={(e) =>
-									setFormData({ ...formData, firstName: e.target.value })
-								}
-								required
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="lastName">Nom</Label>
-							<Input
-								id="lastName"
-								value={formData.lastName}
-								onChange={(e) =>
-									setFormData({ ...formData, lastName: e.target.value })
-								}
-								required
-							/>
-						</div>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
-						<Input
-							id="email"
-							type="email"
-							value={formData.email}
-							onChange={(e) =>
-								setFormData({ ...formData, email: e.target.value })
-							}
-							required
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="phone">Téléphone</Label>
-						<Input
-							id="phone"
-							value={formData.phone}
-							onChange={(e) =>
-								setFormData({ ...formData, phone: e.target.value })
-							}
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="password">Mot de passe</Label>
-						<Input
-							id="password"
-							type="password"
-							value={formData.password}
-							onChange={(e) =>
-								setFormData({ ...formData, password: e.target.value })
-							}
-							required
-							minLength={6}
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="role">Rôle</Label>
-						<select
-							id="role"
-							className="w-full rounded-md border border-input bg-background px-3 py-2"
-							value={formData.role}
-							onChange={(e) =>
-								setFormData({
-									...formData,
-									role: e.target.value as "ADMIN" | "EMPLOYEE",
-								})
-							}
-						>
-							<option value="EMPLOYEE">Employé</option>
-							<option value="ADMIN">Administrateur</option>
-						</select>
-					</div>
-
-					<div className="flex justify-end gap-3 pt-4">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setShowCreateModal(false)}
-						>
-							Annuler
-						</Button>
-						<Button type="submit" disabled={createUser.isPending}>
-							{createUser.isPending && (
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-							)}
-							Créer
-						</Button>
-					</div>
-				</form>
-			</Modal>
+			<UserFormModal
+				isOpen={showFormModal}
+				onClose={closeFormModal}
+				onSubmit={handleFormSubmit}
+				user={selectedUser}
+				isLoading={createUser.isPending || updateUser.isPending}
+			/>
 
 			<ConfirmDialog
 				isOpen={showDeleteModal}
-				onClose={() => {
-					setShowDeleteModal(false);
-					setUserToDelete(null);
-				}}
+				onClose={() => { setShowDeleteModal(false); setUserToDelete(null); }}
 				onConfirm={handleDeleteUser}
 				title="Supprimer cet utilisateur ?"
 				description="Cette action est irréversible."
@@ -288,4 +214,3 @@ export default function AdminUsersPage() {
 		</div>
 	);
 }
-

@@ -54,3 +54,24 @@ export function useDeleteUser() {
 		},
 	});
 }
+
+export interface UpdateUserInput {
+	email?: string;
+	firstName?: string;
+	lastName?: string;
+	phone?: string;
+	role?: "ADMIN" | "EMPLOYEE";
+}
+
+export function useUpdateUser() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ id, data }: { id: string; data: UpdateUserInput }) =>
+			api.put<ApiResponse<User>>(`/users/${id}`, data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["users"] });
+		},
+	});
+}
+

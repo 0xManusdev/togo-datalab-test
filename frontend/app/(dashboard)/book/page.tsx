@@ -248,7 +248,6 @@ export default function BookPage() {
 					</div>
 				)}
 
-				{/* Recent Bookings Section */}
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between">
 						<CardTitle className="text-lg flex items-center gap-2">
@@ -298,15 +297,16 @@ export default function BookPage() {
 												<Car className="h-6 w-6" />
 											</div>
 											<div>
-												<p className="font-medium">
+												<p className="font-light text-xs">
 													{booking.vehicle.brand} {booking.vehicle.model}
 												</p>
-												<p className="text-sm text-muted-foreground">
+												<p className="text-xs text-muted-foreground">
 													{formatDate(booking.startDate)} → {formatDate(booking.endDate)}
 												</p>
 											</div>
 										</div>
 										<Badge
+											className="font-xs font-light"
 											variant={booking.status === "CONFIRMED" ? "success" : "secondary"}
 										>
 											{booking.status === "CONFIRMED" ? (
@@ -323,7 +323,6 @@ export default function BookPage() {
 				</Card>
 			</div>
 
-			{/* Confirmation Modal */}
 			<Modal
 				isOpen={!!selectedVehicle}
 				onClose={() => setSelectedVehicle(null)}
@@ -332,34 +331,31 @@ export default function BookPage() {
 			>
 				{selectedVehicle && (
 					<div className="space-y-6">
-						{/* Vehicle Info */}
 						<div className="flex items-center gap-4 rounded-lg border p-4">
 							<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
 								<Car className="h-6 w-6" />
 							</div>
 							<div className="flex-1">
-								<p className="font-medium">
+								<p className="font-light text-xs">
 									{selectedVehicle.brand} {selectedVehicle.model}
 								</p>
-								<p className="text-sm text-muted-foreground">
+								<p className="text-xs text-muted-foreground">
 									{selectedVehicle.licensePlate}
 								</p>
 							</div>
 						</div>
 
-						{/* Booking Details */}
 						<div className="rounded-lg bg-muted p-4 text-sm space-y-2">
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">Du</span>
-								<span className="font-medium">{formatDate(startDateISO)}</span>
+								<span className="font-normal text-xs">{formatDate(startDateISO)}</span>
 							</div>
 							<div className="flex justify-between">
 								<span className="text-muted-foreground">Au</span>
-								<span className="font-medium">{formatDate(endDateISO)}</span>
+								<span className="font-normal text-xs">{formatDate(endDateISO)}</span>
 							</div>
 						</div>
 
-						{/* Destination Input */}
 						<div className="space-y-2">
 							<Label htmlFor="destination" className="flex items-center gap-2">
 								<MapPin className="h-4 w-4" />
@@ -377,7 +373,6 @@ export default function BookPage() {
 							/>
 						</div>
 
-						{/* Reason Input */}
 						<div className="space-y-2">
 							<Label htmlFor="reason" className="flex items-center gap-2">
 								<FileText className="h-4 w-4" />
@@ -399,7 +394,6 @@ export default function BookPage() {
 							</div>
 						</div>
 
-						{/* Actions */}
 						<div className="flex justify-end gap-3">
 							<Button
 								variant="outline"

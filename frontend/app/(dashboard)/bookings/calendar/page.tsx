@@ -52,12 +52,10 @@ export default function BookingsCalendarPage() {
 
 		const days: (number | null)[] = [];
 
-		// Add empty slots for days before the first day of the month
 		for (let i = 0; i < startingDay; i++) {
 			days.push(null);
 		}
 
-		// Add the days of the month
 		for (let i = 1; i <= totalDays; i++) {
 			days.push(i);
 		}
@@ -129,7 +127,6 @@ export default function BookingsCalendarPage() {
 						</div>
 					) : (
 						<>
-							{/* Day headers */}
 							<div className="mb-2 grid grid-cols-7 gap-1">
 								{dayNames.map((day) => (
 									<div
@@ -141,7 +138,6 @@ export default function BookingsCalendarPage() {
 								))}
 							</div>
 
-							{/* Calendar grid */}
 							<div className="grid grid-cols-7 gap-1">
 								{calendarDays.map((day, index) => {
 									if (day === null) {
