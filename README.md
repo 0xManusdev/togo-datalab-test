@@ -354,10 +354,12 @@ npm test
 |-------|-------|
 | **BookingService** | 24 tests (création, dates, chevauchement, annulation, modification, suppression) |
 | **VehicleService** | 11 tests (CRUD, disponibilité, suppression avec réservations) |
+| **UserService** | 9 tests (CRUD Admin, pagination, gestion des conflits) |
+| **UploadService** | 5 tests (Upload/Delete images, mocks Supabase) |
 | **AuthService** | 7 tests (login, getUserById, messages d'erreur unifiés) |
 | **AuthMiddleware** | 7 tests (authentification, autorisation admin) |
 | **SchémasZod** | 22 tests (validation entrées) |
-| **Total** | **71 tests** |
+| **Total** | **85 tests** |
 
 ### Collection Postman
 
